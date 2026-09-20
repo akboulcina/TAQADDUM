@@ -10,7 +10,7 @@ importers:
       '@eslint/js':
         specifier: ^9.17.0
         version: 9.17.0
-      '@types/node:
+      '@types/node':
         specifier: ^22.10.5
         version: 22.10.5
       dependency-cruiser:
@@ -26,14 +26,85 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
       vitest:
-        specifier: ^2.1.8
+        specifier: 2.1.8
         version: 2.1.8
-  apps/api: {}
-  apps/storybook: {}
+  apps/api:
+    dependencies:
+      '@nestjs/common':
+        specifier: ^11.0.3
+        version: 11.0.3
+      '@nestjs/core':
+        specifier: ^11.0.3
+        version: 11.0.3
+      '@nestjs/platform-fastify':
+        specifier: ^11.0.3
+        version: 11.0.3
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.1
+  apps/storybook:
+    dependencies:
+      '@storybook/addon-a11y':
+        specifier: ^8.4.7
+        version: 8.4.7
+      '@storybook/addon-essentials':
+        specifier: ^8.4.7
+        version: 8.4.7
+      '@storybook/react':
+        specifier: ^8.4.7
+        version: 8.4.7
+      '@storybook/react-vite':
+        specifier: ^8.4.7
+        version: 8.4.7
+      react:
+        specifier: ^19.0.0
+        version: 19.0.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.0.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+      vite:
+        specifier: ^6.0.7
+        version: 6.0.7
+    devDependencies:
+      storybook:
+        specifier: ^8.4.7
+        version: 8.4.7
+  apps/web:
+    dependencies:
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.3.4
+      react:
+        specifier: ^19.0.0
+        version: 19.0.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.0.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+      vite:
+        specifier: ^6.0.7
+        version: 6.0.7
   apps/worker: {}
-  apps/web: {}
   packages/design-tokens: {}
-  packages/ui: {}
+  packages/ui:
+    dependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.0.0
+      react:
+        specifier: ^19.0.0
+        version: 19.0.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
   packages/i18n-ui: {}
   packages/contract-types: {}
   packages/observability: {}

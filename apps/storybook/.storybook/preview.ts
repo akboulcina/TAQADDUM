@@ -1,2 +1,4 @@
 import '../../../packages/design-tokens/tokens.css';
-export default {parameters:{a11y:{test:'todo'}}};
+import type { Preview } from '@storybook/react';
+const preview: Preview = { parameters: { a11y: { test: 'todo' } } };
+export default preview;
