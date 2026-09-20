@@ -1,1 +1,25 @@
-{"name":"@taqaddum/root","private":true,"packageManager":"pnpm@9.15.5","engines":{"node":">=22.0.0 <23"},"scripts":{"format:check":"prettier --check .","lint":"eslint .","typecheck":"tsc -b --pretty false","test":"vitest run","build":"pnpm -r --if-present build","boundaries":"dependency-cruiser --validate .dependency-cruiser.cjs .","compose:config":"docker compose config --quiet"},"devDependencies":{"@eslint/js":"^9.17.0","@types/node":"^22.10.5","dependency-cruiser":"^16.8.3","eslint":"^9.17.0","prettier":"^3.4.2","typescript":"^5.7.2","vitest":"^2.1.8"}}
+{
+  "name": "@taqaddum/root",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.5",
+  "engines": { "node": ">=22.0.0 <23" },
+  "scripts": {
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run",
+    "build": "pnpm -r --if-present build",
+    "boundaries": "dependency-cruiser --validate .dependency-cruiser.cjs .",
+    "compose:config": "docker compose config --quiet"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.5",
+    "dependency-cruiser": "^16.8.3",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

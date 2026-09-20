@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { AlertBanner, Button, StatusBadge, Text } from '../../../packages/ui/src/index';
+import { AlertBanner, Button, StatusBadge, Text } from '../../../packages/ui/src/index.js';
+
 const meta = { title: 'Foundations/Components', tags: ['autodocs'] } satisfies Meta;
 export default meta;
+
 export const ButtonFr: StoryObj = { render: () => <Button>Enregistrer</Button> };
 export const ButtonEn: StoryObj = { render: () => <Button>Save</Button> };
 export const ButtonArRtl: StoryObj = { render: () => <div dir="rtl"><Button>حفظ</Button></div> };
