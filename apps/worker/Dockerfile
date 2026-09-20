@@ -5,4 +5,4 @@ COPY apps/worker/package.json apps/worker/tsconfig.json ./apps/worker/
 RUN corepack enable && pnpm install --frozen-lockfile
 COPY apps/worker/src ./apps/worker/src
 RUN pnpm --filter @taqaddum/worker build
-CMD ["node","apps/worker/dist/main.js"]
+CMD ["node", "apps/worker/dist/main.js"]

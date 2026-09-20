@@ -16,7 +16,9 @@ services:
       MINIO_ROOT_PASSWORD: minio_local_password_only
     ports: ['9000:9000', '9001:9001']
   api:
-    build: ./apps/api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
       NODE_ENV: local
       APP_VERSION: 0.1.0
@@ -26,14 +28,18 @@ services:
       postgres: { condition: service_healthy }
       minio: { condition: service_started }
   worker:
-    build: ./apps/worker
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
     environment:
       NODE_ENV: local
       APP_VERSION: 0.1.0
     depends_on:
       postgres: { condition: service_healthy }
   web:
-    build: ./apps/web
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
     environment:
       VITE_API_BASE_URL: http://localhost:3000
     ports: ['5173:80']

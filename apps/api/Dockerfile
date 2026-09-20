@@ -5,4 +5,4 @@ COPY apps/api/package.json apps/api/tsconfig.json ./apps/api/
 RUN corepack enable && pnpm install --frozen-lockfile
 COPY apps/api/src ./apps/api/src
 RUN pnpm --filter @taqaddum/api build
-CMD ["node","apps/api/dist/main.js"]
+CMD ["node", "apps/api/dist/main.js"]
