@@ -1,9 +1,9 @@
 import 'reflect-metadata';
+import { randomUUID } from 'node:crypto';
 import { Controller, Get, Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
-
-const context = () => ({ request_id: crypto.randomUUID(), correlation_id: crypto.randomUUID() });
+const context = () => ({ request_id: randomUUID(), correlation_id: randomUUID() });
 @Controller('health')
 class HealthController {
   private response() { return { status: 'ok', service: 'api', version: process.env.APP_VERSION ?? '0.1.0', environment: process.env.NODE_ENV ?? 'local', timestamp: new Date().toISOString(), ...context() }; }
