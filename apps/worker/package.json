@@ -2,5 +2,8 @@
   "name": "@taqaddum/worker",
   "private": true,
   "type": "module",
-  "scripts": { "build": "tsc -p tsconfig.json", "start": "node dist/main.js" }
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js"
+  }
 }

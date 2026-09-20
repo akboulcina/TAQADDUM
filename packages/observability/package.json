@@ -1,1 +1,4 @@
-{"name":"@taqaddum/observability","private":true}
+{
+  "name": "@taqaddum/observability",
+  "private": true
+}

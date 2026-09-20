@@ -7,9 +7,9 @@ paths:
     get:
       operationId: healthLive
       responses:
-        '200': {description: OK}
+        '200': { description: OK }
   /health/ready:
     get:
       operationId: healthReady
       responses:
-        '200': {description: OK}
+        '200': { description: OK }

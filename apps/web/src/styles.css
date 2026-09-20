@@ -1,5 +1,21 @@
 @import '../../../packages/design-tokens/tokens.css';
-:root { font-family: var(--font-ui); color: var(--color-text-primary); background: var(--color-bg-canvas); }
-main { padding: var(--space-6); max-width: var(--content-max-width); margin-inline: auto; }
-select { min-height: var(--control-height-md); padding-inline: var(--space-4); border: 1px solid var(--color-border-default); border-radius: var(--radius-md); }
-:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+:root {
+  font-family: var(--font-ui);
+  color: var(--color-text-primary);
+  background: var(--color-bg-canvas);
+}
+main {
+  padding: var(--space-6);
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+}
+select {
+  min-height: var(--control-height-md);
+  padding-inline: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
