@@ -1,0 +1,2 @@
+import type { CommandContext } from './platform/command-context.js';
+export function auditRoutes(context: CommandContext, url: string) { const parsed = new URL(url,'http://localhost'); if (parsed.pathname !== '/v1/audit/records') return null; if (!context.permissions.includes('audit.read')) return { error: { type:'about:blank', title:'Forbidden', status:403, detail:'audit.read is required' } }; return { data: [], page: { limit: Math.min(Number(parsed.searchParams.get('limit') ?? 25),100), next_cursor: null, has_more: false } }; }
