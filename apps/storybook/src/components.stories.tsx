@@ -1,0 +1,16 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { AlertBanner, Button, StatusBadge, Text } from '../../../packages/ui/src/index';
+const meta={title:'Foundations/Components',tags:['autodocs']} satisfies Meta;
+export default meta;
+export const ButtonFr:StoryObj={render:()=> <Button>Enregistrer</Button>};
+export const ButtonEn:StoryObj={render:()=> <Button>Save</Button>};
+export const ButtonArRtl:StoryObj={render:()=> <div dir="rtl"><Button>حفظ</Button></div>};
+export const TextFr:StoryObj={render:()=> <Text>Projet</Text>};
+export const TextEn:StoryObj={render:()=> <Text>Project</Text>};
+export const TextArRtl:StoryObj={render:()=> <div dir="rtl"><Text>مشروع</Text></div>};
+export const StatusBadgeFr:StoryObj={render:()=> <StatusBadge>Actif</StatusBadge>};
+export const StatusBadgeEn:StoryObj={render:()=> <StatusBadge>Active</StatusBadge>};
+export const StatusBadgeArRtl:StoryObj={render:()=> <div dir="rtl"><StatusBadge>نشط</StatusBadge></div>};
+export const AlertBannerFr:StoryObj={render:()=> <AlertBanner>API connectée</AlertBanner>};
+export const AlertBannerEn:StoryObj={render:()=> <AlertBanner>API connected</AlertBanner>};
+export const AlertBannerArRtl:StoryObj={render:()=> <div dir="rtl"><AlertBanner>واجهة API متصلة</AlertBanner></div>};
