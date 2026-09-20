@@ -15,7 +15,9 @@ db-check:
 	@psql "$(DATABASE_URL)" -v ON_ERROR_STOP=1 -f database/verification/check-ownership.sql; psql "$(DATABASE_URL)" -v ON_ERROR_STOP=1 -f database/verification/check-audit-platform.sql
 test:
 	@DATABASE_URL="$(DATABASE_URL)" sh database/tests/db-tests.sh; DATABASE_URL="$(DATABASE_URL)" sh database/tests/identity-org-tests.sh; DATABASE_URL="$(DATABASE_URL)" sh database/tests/audit-platform-tests.sh
+
 test-audit:
 	@DATABASE_URL="$(DATABASE_URL)" sh database/tests/audit-platform-tests.sh
+
 test-outbox:
 	@DATABASE_URL="$(DATABASE_URL)" sh database/tests/audit-platform-tests.sh
