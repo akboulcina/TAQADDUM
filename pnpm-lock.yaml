@@ -1,0 +1,80 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+  .:
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.17.0
+        version: 9.17.0
+      '@types/node':
+        specifier: ^22.10.5
+        version: 22.10.5
+      dependency-cruiser:
+        specifier: ^16.8.3
+        version: 16.8.3
+      eslint:
+        specifier: ^9.17.0
+        version: 9.17.0
+      prettier:
+        specifier: ^3.4.2
+        version: 3.4.2
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.8
+  apps/api:
+    dependencies:
+      '@nestjs/common':
+        specifier: ^11.0.3
+        version: 11.0.3
+      '@nestjs/core':
+        specifier: ^11.0.3
+        version: 11.0.3
+      '@nestjs/platform-fastify':
+        specifier: ^11.0.3
+        version: 11.0.3
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.1
+  apps/worker: {}
+  apps/web:
+    dependencies:
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.3.4
+      react:
+        specifier: ^19.0.0
+        version: 19.0.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.0.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+      vite:
+        specifier: ^6.0.7
+        version: 6.0.7
+  packages/design-tokens: {}
+  packages/ui:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.0.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.0.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+
+packages: {}
