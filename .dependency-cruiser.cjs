@@ -1,0 +1,12 @@
+module.exports = {
+  forbidden: [
+    { name: 'no-circular', severity: 'error', from: { path: '^modules/' }, to: { circular: true } },
+    {
+      name: 'no-module-internals',
+      severity: 'error',
+      from: { path: '^modules/' },
+      to: { path: '^modules/', pathNot: '^modules/[^/]+/src/public/' },
+    },
+  ],
+  options: { doNotFollow: { path: 'node_modules' }, tsConfig: { fileName: 'tsconfig.base.json' } },
+};
