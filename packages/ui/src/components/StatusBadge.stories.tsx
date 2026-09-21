@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { StatusBadge } from './StatusBadge.js';
+import type { StatusBadgeProps } from './StatusBadge.js';
 
 const meta = {
   title: 'Components/StatusBadge',
@@ -9,7 +10,7 @@ const meta = {
 } satisfies Meta<typeof StatusBadge>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<StatusBadgeProps>;
 
 export const Success: Story = {
   args: { children: 'Active', tone: 'success' },

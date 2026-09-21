@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Text } from './Text.js';
+import type { TextProps } from './Text.js';
 
 const meta = {
   title: 'Components/Text',
@@ -9,7 +10,7 @@ const meta = {
 } satisfies Meta<typeof Text>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<TextProps>;
 
 export const Body: Story = {
   args: { children: 'TAQADDUM design system', variant: 'body-md' },

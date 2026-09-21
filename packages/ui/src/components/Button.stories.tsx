@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Button } from './Button.js';
+import type { ButtonProps } from './Button.js';
 
 const meta = {
   title: 'Components/Button',
@@ -10,7 +11,7 @@ const meta = {
 } satisfies Meta<typeof Button>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ButtonProps>;
 
 export const Primary: Story = {
   args: { children: 'Create', variant: 'primary', size: 'md' },
