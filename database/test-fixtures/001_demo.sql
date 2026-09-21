@@ -4,57 +4,60 @@ DECLARE
   v_org_id uuid;
   v_actor_id uuid;
 BEGIN
-  INSERT INTO org.tenants (
-    tenant_code, name_fr, name_ar, name_en, status, created_by, updated_by
-  )
-  VALUES (
-    'demo-tenant', 'Démo', 'تجريبي', 'Demo', 'active', gen_random_uuid(), gen_random_uuid()
-  )
-  ON CONFLICT (tenant_code) DO UPDATE SET
-    name_fr = EXCLUDED.name_fr,
-    name_ar = EXCLUDED.name_ar,
-    name_en = EXCLUDED.name_en,
-    status = EXCLUDED.status,
-    updated_by = gen_random_uuid()
-  RETURNING id INTO v_tenant_id;
+  SELECT id INTO v_tenant_id
+  FROM org.tenants
+  WHERE tenant_code = 'demo-tenant'
+  LIMIT 1;
 
   IF v_tenant_id IS NULL THEN
-    SELECT id INTO v_tenant_id FROM org.tenants WHERE tenant_code = 'demo-tenant';
+    v_tenant_id := gen_random_uuid();
+    INSERT INTO org.tenants (
+      id, tenant_code, name_fr, name_ar, name_en, status, created_by, updated_by
+    )
+    VALUES (
+      v_tenant_id, 'demo-tenant', 'Démo', 'تجريبي', 'Demo', 'active', gen_random_uuid(), gen_random_uuid()
+    );
+  ELSE
+    UPDATE org.tenants
+    SET name_fr = 'Démo', name_ar = 'تجريبي', name_en = 'Demo', status = 'active', updated_by = gen_random_uuid()
+    WHERE id = v_tenant_id;
   END IF;
 
-  INSERT INTO org.organizations (
-    tenant_id, organization_code, name_fr, name_ar, name_en, status, created_by, updated_by
-  )
-  VALUES (
-    v_tenant_id, 'demo-org', 'Démo Org', 'منظمة تجريبية', 'Demo Org', 'active', gen_random_uuid(), gen_random_uuid()
-  )
-  ON CONFLICT (organization_code) DO UPDATE SET
-    name_fr = EXCLUDED.name_fr,
-    name_ar = EXCLUDED.name_ar,
-    name_en = EXCLUDED.name_en,
-    status = EXCLUDED.status,
-    updated_by = gen_random_uuid()
-  RETURNING id INTO v_org_id;
+  SELECT id INTO v_org_id
+  FROM org.organizations
+  WHERE tenant_id = v_tenant_id AND organization_code = 'demo-org'
+  LIMIT 1;
 
   IF v_org_id IS NULL THEN
-    SELECT id INTO v_org_id FROM org.organizations WHERE organization_code = 'demo-org';
+    v_org_id := gen_random_uuid();
+    INSERT INTO org.organizations (
+      id, tenant_id, organization_code, name_fr, name_ar, name_en, status, created_by, updated_by
+    )
+    VALUES (
+      v_org_id, v_tenant_id, 'demo-org', 'Démo Org', 'منظمة تجريبية', 'Demo Org', 'active', gen_random_uuid(), gen_random_uuid()
+    );
+  ELSE
+    UPDATE org.organizations
+    SET name_fr = 'Démo Org', name_ar = 'منظمة تجريبية', name_en = 'Demo Org', status = 'active', updated_by = gen_random_uuid()
+    WHERE id = v_org_id;
   END IF;
 
-  INSERT INTO identity.users (
-    tenant_id, email, display_name, status, created_by, updated_by
-  )
-  VALUES (
-    v_tenant_id, 'admin@example.test', 'Demo Admin', 'active', gen_random_uuid(), gen_random_uuid()
-  )
-  ON CONFLICT (tenant_id, email) DO UPDATE SET
-    display_name = EXCLUDED.display_name,
-    status = EXCLUDED.status,
-    updated_by = gen_random_uuid()
-  RETURNING id INTO v_actor_id;
+  SELECT id INTO v_actor_id
+  FROM identity.users
+  WHERE tenant_id = v_tenant_id AND email = 'admin@example.test'
+  LIMIT 1;
 
   IF v_actor_id IS NULL THEN
-    SELECT id INTO v_actor_id FROM identity.users
-    WHERE tenant_id = v_tenant_id AND email = 'admin@example.test';
+    INSERT INTO identity.users (
+      id, tenant_id, email, display_name, status, created_by, updated_by
+    )
+    VALUES (
+      gen_random_uuid(), v_tenant_id, 'admin@example.test', 'Demo Admin', 'active', gen_random_uuid(), gen_random_uuid()
+    );
+  ELSE
+    UPDATE identity.users
+    SET display_name = 'Demo Admin', status = 'active', updated_by = gen_random_uuid()
+    WHERE id = v_actor_id;
   END IF;
 END
 $$;
