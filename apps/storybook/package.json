@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "storybook build -o storybook-static",
-    "dev": "storybook dev -p 6006 --host 0.0.0.0"
+    "dev": "storybook dev -p 6006 --host 0.0.0.0",
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "react": "^19.0.0",
