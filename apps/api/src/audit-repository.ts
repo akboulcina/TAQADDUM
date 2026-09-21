@@ -1,4 +1,63 @@
 import type { CommandContext } from './platform/command-context.js';
-export type AuditRecord = { id: string; tenant_id: string; organization_id: string; actor_type: string; actor_id: string; actor_display_snapshot: string | null; action_code: string; target_context: string; target_aggregate_type: string; target_aggregate_id: string; outcome: string; correlation_id: string; occurred_at: string };
-export interface AuditRepository { list(context: CommandContext, filters: Record<string,string|undefined>): Promise<{records: AuditRecord[]; nextCursor: string|null; hasMore: boolean}>; }
-export class PostgresAuditRepository implements AuditRepository { constructor(private readonly queryFn: (text:string, values: unknown[]) => Promise<{rows: AuditRecord[]}>) {} async list(context: CommandContext, filters: Record<string,string|undefined>) { const limit=Math.min(Math.max(Number(filters.limit ?? 25),1),100); const values: unknown[]=[context.tenant_id]; const where=['tenant_id = $1']; const add=(sql:string,value:unknown)=>{values.push(value);where.push(`${sql} = $${values.length}`);}; if(filters.organization_id){ if(filters.organization_id!==context.organization_id) throw new Error('organization scope denied'); add('organization_id',filters.organization_id); } if(filters.target_context) add('target_context',filters.target_context); if(filters.target_aggregate_type) add('target_aggregate_type',filters.target_aggregate_type); if(filters.target_aggregate_id) add('target_aggregate_id',filters.target_aggregate_id); if(filters.action_code) add('action_code',filters.action_code); if(filters.from){values.push(filters.from);where.push(`occurred_at >= $${values.length}`);} if(filters.to){values.push(filters.to);where.push(`occurred_at <= $${values.length}`);} if(filters.cursor){values.push(filters.cursor);where.push(`occurred_at < $${values.length}`);} values.push(limit+1); const sql=`SELECT id,tenant_id,organization_id,actor_type,actor_id,actor_display_snapshot,action_code,target_context,target_aggregate_type,target_aggregate_id,outcome,correlation_id,occurred_at FROM audit.audit_records WHERE ${where.join(' AND ')} ORDER BY occurred_at DESC,id DESC LIMIT $${values.length}`; const result=await this.queryFn(sql,values); const records=result.rows.slice(0,limit); const hasMore=result.rows.length>limit; return {records,nextCursor:hasMore ? records.at(-1)?.occurred_at ?? null : null,hasMore}; } }
+export type AuditRecord = {
+  id: string;
+  tenant_id: string;
+  organization_id: string;
+  actor_type: string;
+  actor_id: string;
+  actor_display_snapshot: string | null;
+  action_code: string;
+  target_context: string;
+  target_aggregate_type: string;
+  target_aggregate_id: string;
+  outcome: string;
+  correlation_id: string;
+  occurred_at: string;
+};
+export interface AuditRepository {
+  list(
+    context: CommandContext,
+    filters: Record<string, string | undefined>,
+  ): Promise<{ records: AuditRecord[]; nextCursor: string | null; hasMore: boolean }>;
+}
+export class PostgresAuditRepository implements AuditRepository {
+  constructor(
+    private readonly queryFn: (text: string, values: unknown[]) => Promise<{ rows: AuditRecord[] }>,
+  ) {}
+  async list(context: CommandContext, filters: Record<string, string | undefined>) {
+    const limit = Math.min(Math.max(Number(filters.limit ?? 25), 1), 100);
+    const values: unknown[] = [context.tenant_id];
+    const where = ['tenant_id = $1'];
+    const add = (sql: string, value: unknown) => {
+      values.push(value);
+      where.push(`${sql} = $${values.length}`);
+    };
+    if (filters.organization_id) {
+      if (filters.organization_id !== context.organization_id)
+        throw new Error('organization scope denied');
+      add('organization_id', filters.organization_id);
+    }
+    if (filters.target_context) add('target_context', filters.target_context);
+    if (filters.target_aggregate_type) add('target_aggregate_type', filters.target_aggregate_type);
+    if (filters.target_aggregate_id) add('target_aggregate_id', filters.target_aggregate_id);
+    if (filters.action_code) add('action_code', filters.action_code);
+    if (filters.from) {
+      values.push(filters.from);
+      where.push(`occurred_at >= $${values.length}`);
+    }
+    if (filters.to) {
+      values.push(filters.to);
+      where.push(`occurred_at <= $${values.length}`);
+    }
+    if (filters.cursor) {
+      values.push(filters.cursor);
+      where.push(`occurred_at < $${values.length}`);
+    }
+    values.push(limit + 1);
+    const sql = `SELECT id,tenant_id,organization_id,actor_type,actor_id,actor_display_snapshot,action_code,target_context,target_aggregate_type,target_aggregate_id,outcome,correlation_id,occurred_at FROM audit.audit_records WHERE ${where.join(' AND ')} ORDER BY occurred_at DESC,id DESC LIMIT $${values.length}`;
+    const result = await this.queryFn(sql, values);
+    const records = result.rows.slice(0, limit);
+    const hasMore = result.rows.length > limit;
+    return { records, nextCursor: hasMore ? (records.at(-1)?.occurred_at ?? null) : null, hasMore };
+  }
+}
