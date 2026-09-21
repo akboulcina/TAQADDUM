@@ -1,0 +1,24 @@
+{
+  "name": "@taqaddum/storybook",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "storybook build -o storybook-static",
+    "dev": "storybook dev -p 6006 --host 0.0.0.0"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^8.4.7",
+    "@storybook/addon-essentials": "^8.4.7",
+    "@storybook/react": "^8.4.7",
+    "@storybook/react-vite": "^8.4.7",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "storybook": "^8.4.7"
+  }
+}
