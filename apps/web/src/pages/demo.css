@@ -1,0 +1,40 @@
+.demo {
+  min-block-size: 100vh;
+  padding: var(--space-6);
+  background: var(--color-bg-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+}
+
+.demo__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-block-end: var(--space-6);
+}
+
+.demo__locale-switcher,
+.demo__badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.demo__main {
+  display: grid;
+  gap: var(--space-6);
+  max-inline-size: 720px;
+  margin-inline: auto;
+}
+
+.demo__card {
+  display: grid;
+  gap: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  background: var(--color-bg-surface);
+  box-shadow: var(--elevation-raised);
+}
