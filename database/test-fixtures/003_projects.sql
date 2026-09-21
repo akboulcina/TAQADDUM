@@ -128,9 +128,9 @@ BEGIN
     description_ar = EXCLUDED.description_ar,
     description_en = EXCLUDED.description_en,
     status = 'authorized',
-    authorized_at = COALESCE(project.projects.authorized_at, EXCLUDED.authorized_at),
+    authorized_at = COALESCE(p.authorized_at, EXCLUDED.authorized_at),
     authorized_by = EXCLUDED.authorized_by,
-    version = GREATEST(project.projects.version, EXCLUDED.version),
+    version = GREATEST(p.version, EXCLUDED.version),
     updated_by = v_actor_id;
 END
 $$;
