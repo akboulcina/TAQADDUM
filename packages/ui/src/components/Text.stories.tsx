@@ -9,7 +9,7 @@ const meta = {
 } satisfies Meta<typeof Text>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Text>;
 
 export const Body: Story = {
   args: { children: 'TAQADDUM design system', variant: 'body-md' },

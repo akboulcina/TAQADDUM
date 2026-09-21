@@ -9,7 +9,7 @@ const meta = {
 } satisfies Meta<typeof AlertBanner>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof AlertBanner>;
 
 export const Info: Story = {
   args: { children: 'Service ready', tone: 'info' },
