@@ -5,7 +5,6 @@ import type { StatusBadgeProps } from './StatusBadge.js';
 
 const meta = {
   title: 'Components/StatusBadge',
-  component: StatusBadge,
   tags: ['autodocs'],
 } satisfies Meta<typeof StatusBadge>;
 

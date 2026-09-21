@@ -5,7 +5,6 @@ import type { AlertBannerProps } from './AlertBanner.js';
 
 const meta = {
   title: 'Components/AlertBanner',
-  component: AlertBanner,
   tags: ['autodocs'],
 } satisfies Meta<typeof AlertBanner>;
 
