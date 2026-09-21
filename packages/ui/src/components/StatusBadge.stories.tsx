@@ -9,7 +9,7 @@ const meta = {
 } satisfies Meta<typeof StatusBadge>;
 
 export default meta;
-type Story = StoryObj<typeof StatusBadge>;
+type Story = StoryObj<typeof meta>;
 
 export const Success: Story = {
   args: { children: 'Active', tone: 'success' },
