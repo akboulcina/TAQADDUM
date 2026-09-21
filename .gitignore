@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+storybook-static/
+.env
+.env.*
+!.env.example
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+docker-compose.local.yml

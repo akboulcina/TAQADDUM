@@ -1,0 +1,1 @@
+Run check-ownership.sql through psql. It reports schema owners, taq_* roles, and CREATE privileges for runtime app roles. db-check also validates extensions, required schemas, and required technical tables.

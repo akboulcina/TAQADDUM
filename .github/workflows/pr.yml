@@ -1,0 +1,61 @@
+name: PR checks
+on: [pull_request]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: cimg/postgres:16.10-postgis
+        env:
+          POSTGRES_DB: taqaddum
+          POSTGRES_USER: taqaddum
+          POSTGRES_PASSWORD: taqaddum_local_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U taqaddum -d taqaddum"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Bootstrap database
+        env:
+          PGPASSWORD: taqaddum_local_only
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: taqaddum
+          PGDATABASE: taqaddum
+        run: |
+          set -euo pipefail
+          for script in database/bootstrap/*.sql; do
+            echo "Applying $script"
+            psql -v ON_ERROR_STOP=1 -f "$script"
+          done
+          for migration in database/migrations/*.sql; do
+            echo "Applying $migration"
+            psql -v ON_ERROR_STOP=1 -f "$migration"
+          done
+          for fixture in database/test-fixtures/*.sql; do
+            echo "Applying $fixture"
+            psql -v ON_ERROR_STOP=1 -f "$fixture"
+          done
+      - name: Database audit tests
+        env:
+          DATABASE_URL: postgresql://taqaddum:taqaddum_local_only@localhost:5432/taqaddum
+        run: bash database/tests/audit-platform-tests.sh
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test -- --reporter=verbose
+      - run: pnpm boundaries
+      - run: docker compose config --quiet
+      - run: pnpm build
