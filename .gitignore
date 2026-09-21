@@ -9,3 +9,5 @@ storybook-static/
 .vscode/
 .idea/
 *.log
+
+docker-compose.local.yml
