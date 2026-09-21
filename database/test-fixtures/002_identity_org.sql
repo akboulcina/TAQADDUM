@@ -1,9 +1,67 @@
-DO $$ DECLARE admin_id uuid := platform.uuid_v7(); user_id uuid := platform.uuid_v7(); tenant_id uuid := platform.uuid_v7(); org_id uuid := platform.uuid_v7(); bootstrap_id uuid := gen_random_uuid(); BEGIN INSERT INTO org.tenants(id, tenant_code, name_fr, name_ar, name_en, created_by, updated_by) VALUES (tenant_id,'demo-tenant','Tenant Démo','الجهة التجريبية','Demo Tenant',bootstrap_id,bootstrap_id) ON CONFLICT (tenant_code) DO UPDATE SET name_fr=EXCLUDED.name_fr,name_ar=EXCLUDED.name_ar,name_en=EXCLUDED.name_en;
-SELECT id INTO tenant_id FROM org.tenants WHERE tenant_code='demo-tenant';
-INSERT INTO org.organizations(id,tenant_id,organization_code,name_fr,name_ar,name_en,created_by,updated_by) VALUES (org_id,tenant_id,'demo-org','Organisation Démo','المنظمة التجريبية','Demo Organization',bootstrap_id,bootstrap_id) ON CONFLICT (tenant_id,organization_code) DO UPDATE SET name_fr=EXCLUDED.name_fr,name_ar=EXCLUDED.name_ar,name_en=EXCLUDED.name_en;
-SELECT id INTO org_id FROM org.organizations WHERE tenant_id=tenant_id AND organization_code='demo-org';
-INSERT INTO identity.users(id,email,display_name,preferred_locale,created_by,updated_by) VALUES (admin_id,'admin@example.test','Admin Demo','fr',bootstrap_id,bootstrap_id),(user_id,'user@example.test','User Demo','fr',bootstrap_id,bootstrap_id) ON CONFLICT (email) DO UPDATE SET display_name=EXCLUDED.display_name,is_active=true;
-INSERT INTO identity.roles(id,role_code,name_fr,name_ar,name_en,description,created_by) VALUES (platform.uuid_v7(),'org_admin','Administrateur organisation','مسؤول المنظمة','Organization admin','Demo role',bootstrap_id),(platform.uuid_v7(),'user','Utilisateur','مستخدم','User','Demo role',bootstrap_id) ON CONFLICT (role_code) DO NOTHING;
-INSERT INTO identity.permissions(id,permission_code,name_fr,name_ar,name_en,description,created_by) VALUES (platform.uuid_v7(),'projects.read','Lire les projets','قراءة المشاريع','Read projects','Demo permission',bootstrap_id),(platform.uuid_v7(),'projects.create','Créer des projets','إنشاء المشاريع','Create projects','Demo permission',bootstrap_id) ON CONFLICT (permission_code) DO NOTHING;
-INSERT INTO org.memberships(tenant_id,organization_id,user_id,role_code,granted_by,created_by,updated_by) SELECT tenant_id,org_id,id,'org_admin',bootstrap_id,bootstrap_id,bootstrap_id FROM identity.users WHERE email='admin@example.test' ON CONFLICT (tenant_id,organization_id,user_id) DO UPDATE SET membership_status='active',role_code='org_admin';
-INSERT INTO org.memberships(tenant_id,organization_id,user_id,role_code,granted_by,created_by,updated_by) SELECT tenant_id,org_id,id,'user',bootstrap_id,bootstrap_id,bootstrap_id FROM identity.users WHERE email='user@example.test' ON CONFLICT (tenant_id,organization_id,user_id) DO UPDATE SET membership_status='active',role_code='user'; END $$;
+DO $$
+DECLARE
+  v_tenant_id uuid;
+  v_org_id uuid;
+  v_bootstrap_id uuid;
+BEGIN
+  v_bootstrap_id := '00000000-0000-0000-0000-000000000001'::uuid;
+
+  SELECT t.id
+  INTO v_tenant_id
+  FROM org.tenants AS t
+  WHERE t.tenant_code = 'demo-tenant'
+  LIMIT 1;
+
+  IF v_tenant_id IS NULL THEN
+    RAISE EXCEPTION 'demo tenant fixture is missing';
+  END IF;
+
+  INSERT INTO identity.users (
+    id,
+    email,
+    display_name,
+    created_by,
+    updated_by
+  )
+  VALUES (
+    v_bootstrap_id,
+    'admin@example.test',
+    'Demo Administrator',
+    v_bootstrap_id,
+    v_bootstrap_id
+  )
+  ON CONFLICT (email)
+  DO UPDATE SET
+    display_name = EXCLUDED.display_name,
+    updated_by = EXCLUDED.updated_by;
+
+  v_org_id := platform.uuid_v7();
+
+  INSERT INTO org.organizations (
+    id,
+    tenant_id,
+    organization_code,
+    name_fr,
+    name_ar,
+    name_en,
+    created_by,
+    updated_by
+  )
+  VALUES (
+    v_org_id,
+    v_tenant_id,
+    'demo-org',
+    'Organisation Démo',
+    'المنظمة التجريبية',
+    'Demo Organization',
+    v_bootstrap_id,
+    v_bootstrap_id
+  )
+  ON CONFLICT (tenant_id, organization_code)
+  DO UPDATE SET
+    name_fr = EXCLUDED.name_fr,
+    name_ar = EXCLUDED.name_ar,
+    name_en = EXCLUDED.name_en,
+    updated_by = EXCLUDED.updated_by;
+END
+$$;
