@@ -1,5 +1,41 @@
 import type { CommandContext } from './platform/command-context.js';
-const tenant = { id: 'demo-tenant', tenant_code: 'demo-tenant', name: { fr: 'Tenant Démo', ar: 'الجهة التجريبية', en: 'Demo Tenant' }, status: 'active' };
-const organization = { id: 'demo-org', tenant_id: 'demo-tenant', organization_code: 'demo-org', name: { fr: 'Organisation Démo', ar: 'المنظمة التجريبية', en: 'Demo Organization' }, status: 'active' };
-const members = [{ user_id: 'admin@example.test', role_code: 'org_admin', membership_status: 'active' }, { user_id: 'user@example.test', role_code: 'user', membership_status: 'active' }];
-export function identityOrgRoutes(context: CommandContext, path: string) { if (path === '/v1/me') return { data: { actor_id: context.actor_id, actor_type: context.actor_type, display_name: 'Admin Demo', email: 'admin@example.test', tenant_id: context.tenant_id, organization_id: context.organization_id, roles: context.roles, permissions: context.permissions, locale: context.locale, session_id: context.session_id } }; if (path === '/v1/tenants') return { data: [tenant], page: { limit: 25, has_more: false } }; if (path === '/v1/organizations') return { data: [organization], page: { limit: 25, has_more: false } }; if (path.startsWith('/v1/organizations/') && path.endsWith('/members')) return { data: members, page: { limit: 25, has_more: false } }; return null; }
+const tenant = {
+  id: 'demo-tenant',
+  tenant_code: 'demo-tenant',
+  name: { fr: 'Tenant Démo', ar: 'الجهة التجريبية', en: 'Demo Tenant' },
+  status: 'active',
+};
+const organization = {
+  id: 'demo-org',
+  tenant_id: 'demo-tenant',
+  organization_code: 'demo-org',
+  name: { fr: 'Organisation Démo', ar: 'المنظمة التجريبية', en: 'Demo Organization' },
+  status: 'active',
+};
+const members = [
+  { user_id: 'admin@example.test', role_code: 'org_admin', membership_status: 'active' },
+  { user_id: 'user@example.test', role_code: 'user', membership_status: 'active' },
+];
+export function identityOrgRoutes(context: CommandContext, path: string) {
+  if (path === '/v1/me')
+    return {
+      data: {
+        actor_id: context.actor_id,
+        actor_type: context.actor_type,
+        display_name: 'Admin Demo',
+        email: 'admin@example.test',
+        tenant_id: context.tenant_id,
+        organization_id: context.organization_id,
+        roles: context.roles,
+        permissions: context.permissions,
+        locale: context.locale,
+        session_id: context.session_id,
+      },
+    };
+  if (path === '/v1/tenants') return { data: [tenant], page: { limit: 25, has_more: false } };
+  if (path === '/v1/organizations')
+    return { data: [organization], page: { limit: 25, has_more: false } };
+  if (path.startsWith('/v1/organizations/') && path.endsWith('/members'))
+    return { data: members, page: { limit: 25, has_more: false } };
+  return null;
+}
