@@ -5,12 +5,12 @@ import { resolveCommandContext } from './platform/command-context.js';
 import { identityOrgRoutes } from './identity-org-routes.js';
 import { auditRoutes } from './audit-routes.js';
 import { PostgresAuditRepository } from './audit-repository.js';
-const port = Number(process.env.PORT ?? 3000);
+const port = Number(process.env['PORT'] ?? 3000);
 const provider = new MockIdentityProvider();
 const repository = new PostgresAuditRepository(async (text, values) => {
-  if (!process.env.DATABASE_URL) return { rows: [] };
+  if (!process.env['DATABASE_URL']) return { rows: [] };
   const { Client } = await import('pg');
-  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  const client = new Client({ connectionString: process.env['DATABASE_URL'] });
   await client.connect();
   try {
     return { rows: (await client.query(text, values)).rows };
@@ -73,7 +73,7 @@ server.listen(port, () =>
       timestamp: new Date().toISOString(),
       level: 'info',
       service: 'api',
-      environment: process.env.NODE_ENV ?? 'local',
+      environment: process.env['NODE_ENV'] ?? 'local',
       operation: 'startup',
       outcome: 'success',
       port,

@@ -31,7 +31,7 @@ export async function auditRoutes(
       'limit',
     ].map((key) => [key, parsed.searchParams.get(key) ?? undefined]),
   );
-  if (filters.tenant_id && filters.tenant_id !== context.tenant_id)
+  if (filters['tenant_id'] && filters['tenant_id'] !== context.tenant_id)
     return {
       status: 403,
       body: { type: 'about:blank', title: 'Forbidden', status: 403, detail: 'tenant scope denied' },
@@ -42,7 +42,7 @@ export async function auditRoutes(
     body: {
       data: result.records,
       page: {
-        limit: Math.min(Number(filters.limit ?? 25), 100),
+        limit: Math.min(Number(filters['limit'] ?? 25), 100),
         next_cursor: result.nextCursor,
         has_more: result.hasMore,
       },

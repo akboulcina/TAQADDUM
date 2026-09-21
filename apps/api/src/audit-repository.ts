@@ -25,32 +25,33 @@ export class PostgresAuditRepository implements AuditRepository {
     private readonly queryFn: (text: string, values: unknown[]) => Promise<{ rows: AuditRecord[] }>,
   ) {}
   async list(context: CommandContext, filters: Record<string, string | undefined>) {
-    const limit = Math.min(Math.max(Number(filters.limit ?? 25), 1), 100);
+    const limit = Math.min(Math.max(Number(filters['limit'] ?? 25), 1), 100);
     const values: unknown[] = [context.tenant_id];
     const where = ['tenant_id = $1'];
     const add = (sql: string, value: unknown) => {
       values.push(value);
       where.push(`${sql} = $${values.length}`);
     };
-    if (filters.organization_id) {
-      if (filters.organization_id !== context.organization_id)
+    if (filters['organization_id']) {
+      if (filters['organization_id'] !== context.organization_id)
         throw new Error('organization scope denied');
-      add('organization_id', filters.organization_id);
+      add('organization_id', filters['organization_id']);
     }
-    if (filters.target_context) add('target_context', filters.target_context);
-    if (filters.target_aggregate_type) add('target_aggregate_type', filters.target_aggregate_type);
-    if (filters.target_aggregate_id) add('target_aggregate_id', filters.target_aggregate_id);
-    if (filters.action_code) add('action_code', filters.action_code);
-    if (filters.from) {
-      values.push(filters.from);
+    if (filters['target_context']) add('target_context', filters['target_context']);
+    if (filters['target_aggregate_type'])
+      add('target_aggregate_type', filters['target_aggregate_type']);
+    if (filters['target_aggregate_id']) add('target_aggregate_id', filters['target_aggregate_id']);
+    if (filters['action_code']) add('action_code', filters['action_code']);
+    if (filters['from']) {
+      values.push(filters['from']);
       where.push(`occurred_at >= $${values.length}`);
     }
-    if (filters.to) {
-      values.push(filters.to);
+    if (filters['to']) {
+      values.push(filters['to']);
       where.push(`occurred_at <= $${values.length}`);
     }
-    if (filters.cursor) {
-      values.push(filters.cursor);
+    if (filters['cursor']) {
+      values.push(filters['cursor']);
       where.push(`occurred_at < $${values.length}`);
     }
     values.push(limit + 1);
