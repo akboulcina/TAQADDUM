@@ -1,15 +1,270 @@
 openapi: 3.1.0
 info:
   title: TAQADDUM API
-  version: 0.1.0
+  version: 0.7.0
+  description: TAQADDUM API contract for Release 0 foundations.
+  license:
+    name: Proprietary
+    identifier: LicenseRef-TAQADDUM
+
+servers:
+  - url: '{baseUrl}'
+    description: API base URL
+    variables:
+      baseUrl:
+        default: http://localhost:3000
+        description: Local development API URL
+
+tags:
+  - name: health
+  - name: identity
+  - name: audit
+
 paths:
   /health/live:
     get:
-      operationId: healthLive
+      tags: [health]
+      operationId: getHealthLive
+      summary: Health check
+      security: []
       responses:
-        '200': { description: OK }
+        '200':
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
   /health/ready:
     get:
-      operationId: healthReady
+      tags: [health]
+      operationId: getHealthReady
+      summary: Readiness check
+      security: []
       responses:
-        '200': { description: OK }
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /v1/me:
+    get:
+      tags: [identity]
+      operationId: getMe
+      summary: Get current actor claims
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current actor claims
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActorClaims'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/audit/records:
+    get:
+      tags: [audit]
+      operationId: getAuditRecords
+      summary: List audit records
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CursorParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Audit records
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, page]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditRecord'
+                  page:
+                    $ref: '#/components/schemas/CursorPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  headers:
+    ETag:
+      description: Resource version
+      schema:
+        $ref: '#/components/schemas/ETag'
+
+  parameters:
+    CursorParam:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Opaque cursor for pagination.
+
+    LimitParam:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+      description: Page size.
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+    ServiceUnavailable:
+      description: Service unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, service, version, environment, timestamp]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        service:
+          type: string
+        version:
+          type: string
+        environment:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        code:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+        trace_id:
+          type: string
+
+    CursorPage:
+      type: object
+      required: [limit, has_more]
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        next_cursor:
+          type: string
+        has_more:
+          type: boolean
+
+    ActorClaims:
+      type: object
+      required: [actor_id, actor_type]
+      properties:
+        actor_id:
+          type: string
+          format: uuid
+        actor_type:
+          type: string
+          enum: [user, service, system]
+        tenant_id:
+          type: string
+          format: uuid
+        organization_id:
+          type: string
+          format: uuid
+        roles:
+          type: array
+          items:
+            type: string
+
+    ETag:
+      type: string
+      description: Opaque resource version tag.
+      example: '"v1"'
+
+    AuditRecord:
+      type: object
+      required:
+        - id
+        - tenant_id
+        - actor_type
+        - action_code
+        - target_context
+        - target_aggregate_type
+        - target_aggregate_id
+        - outcome
+        - occurred_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenant_id:
+          type: string
+          format: uuid
+        actor_type:
+          type: string
+          enum: [user, service, system]
+        actor_id:
+          type: string
+          format: uuid
+        action_code:
+          type: string
+        target_context:
+          type: string
+        target_aggregate_type:
+          type: string
+        target_aggregate_id:
+          type: string
+          format: uuid
+        outcome:
+          type: string
+          enum: [success, failure, denied, validation_error]
+        occurred_at:
+          type: string
+          format: date-time
