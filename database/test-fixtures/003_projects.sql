@@ -35,7 +35,7 @@ BEGIN
     RAISE EXCEPTION 'demo user fixture is missing';
   END IF;
 
-  INSERT INTO project.projects (
+  INSERT INTO project.projects AS p (
     id,
     tenant_id,
     organization_id,
