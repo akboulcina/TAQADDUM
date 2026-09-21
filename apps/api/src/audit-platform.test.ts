@@ -50,7 +50,12 @@ describe('audit platform', () => {
       ],
       'now',
     );
-    expect(result[0].published_at).toBe('now');
-    expect(result[1].published_at).toBe('old');
+    const first = result[0];
+    const second = result[1];
+
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    expect(first?.published_at).toBe('now');
+    expect(second?.published_at).toBe('old');
   });
 });

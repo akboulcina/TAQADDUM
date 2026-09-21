@@ -17,14 +17,14 @@ export interface IdentityProvider {
 }
 export class MockIdentityProvider implements IdentityProvider {
   async resolve(request: { headers: Record<string, unknown> }): Promise<NormalizedClaims> {
-    if (!['local', 'test'].includes(process.env.NODE_ENV ?? ''))
+    if (!['local', 'test'].includes(process.env['NODE_ENV'] ?? ''))
       throw new Error('Mock identity provider is disabled outside local/test');
     const tenantId = String(request.headers['x-tenant-id'] ?? 'demo-tenant');
     const organizationId = String(request.headers['x-organization-id'] ?? 'demo-org');
     const actorId = String(request.headers['x-actor-id'] ?? 'admin@example.test');
     const locale = String(request.headers['accept-language'] ?? 'fr')
       .split(',')[0]
-      .slice(0, 2) as 'fr' | 'ar' | 'en';
+      ?.slice(0, 2) as 'fr' | 'ar' | 'en';
     return {
       sub: actorId,
       actor_id: actorId,
