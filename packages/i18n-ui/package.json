@@ -1,4 +1,10 @@
 {
   "name": "@taqaddum/i18n-ui",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "react": "^19.0.0"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }

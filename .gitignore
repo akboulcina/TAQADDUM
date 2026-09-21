@@ -11,3 +11,7 @@ storybook-static/
 *.log
 
 docker-compose.local.yml
+**/node_modules/
+**/dist/
+**/storybook-static/
+*.tsbuildinfo

@@ -71,3 +71,8 @@ test-documents:
 		env DATABASE_URL="postgresql://$(DB_USER):$(DB_USER)@localhost:5432/$(DB_NAME)" \
 		sh -s < database/tests/documents-tests.sh
 		sh database/tests/documents-tests.sh
+
+.PHONY: storybook
+
+storybook:
+	cd apps/storybook && pnpm storybook

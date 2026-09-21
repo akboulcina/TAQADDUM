@@ -1,21 +1,23 @@
-@import '../../../packages/design-tokens/tokens.css';
-:root {
+* {
+  box-sizing: border-box;
+}
+
+html {
   font-family: var(--font-ui);
-  color: var(--color-text-primary);
   background: var(--color-bg-canvas);
 }
-main {
-  padding: var(--space-6);
-  max-width: var(--content-max-width);
-  margin-inline: auto;
+
+body {
+  margin: 0;
 }
-select {
-  min-height: var(--control-height-md);
-  padding-inline: var(--space-4);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
+
+button,
+select,
+input {
+  font: inherit;
 }
+
 :focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
