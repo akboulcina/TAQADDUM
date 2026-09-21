@@ -1,26 +1,12 @@
 services:
   postgres:
-<<<<<<< HEAD
-    image: postgis/postgis:16-3.5
-=======
     image: cimg/postgres:16.10-postgis
->>>>>>> origin/feat/pr-004-audit-platform
     environment:
       POSTGRES_DB: taqaddum
       POSTGRES_USER: taqaddum
       POSTGRES_PASSWORD: taqaddum_local_only
     ports: ['5432:5432']
     healthcheck:
-<<<<<<< HEAD
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d taqaddum']
-      interval: 5s
-      timeout: 5s
-      retries: 20
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-volumes:
-  postgres_data:
-=======
       test: ['CMD-SHELL', 'pg_isready -U taqaddum -d taqaddum']
   minio:
     image: quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
@@ -58,4 +44,3 @@ volumes:
       VITE_API_BASE_URL: http://localhost:3000
     ports: ['5173:80']
     depends_on: [api]
->>>>>>> origin/feat/pr-004-audit-platform
