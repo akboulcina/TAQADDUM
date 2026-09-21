@@ -44,15 +44,15 @@ BEGIN
 
   SELECT id INTO v_actor_id
   FROM identity.users
-  WHERE tenant_id = v_tenant_id AND email = 'admin@example.test'
+  WHERE organization_id = v_org_id AND email = 'admin@example.test'
   LIMIT 1;
 
   IF v_actor_id IS NULL THEN
     INSERT INTO identity.users (
-      id, tenant_id, email, display_name, status, created_by, updated_by
+      id, organization_id, email, display_name, status, created_by, updated_by
     )
     VALUES (
-      gen_random_uuid(), v_tenant_id, 'admin@example.test', 'Demo Admin', 'active', gen_random_uuid(), gen_random_uuid()
+      gen_random_uuid(), v_org_id, 'admin@example.test', 'Demo Admin', 'active', gen_random_uuid(), gen_random_uuid()
     );
   ELSE
     UPDATE identity.users
