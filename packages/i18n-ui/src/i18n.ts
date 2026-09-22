@@ -1,0 +1,63 @@
+export const messages = {
+  fr: {
+    app_name: 'TAQADDUM',
+    health_status: 'État du service',
+    service_alive: 'Service actif',
+    service_ready: 'Service prêt',
+    tenants: 'Tenants',
+    organizations: 'Organisations',
+    projects: 'Projets',
+    documents: 'Documents',
+    evidence_links: "Liens d'évidence",
+    audit_records: "Enregistrements d'audit",
+    create: 'Créer',
+    authorize: 'Autoriser',
+    draft: 'Brouillon',
+    authorized: 'Autorisé',
+    archived: 'Archivé',
+    dismiss: 'Fermer',
+  },
+  ar: {
+    app_name: 'تقدم',
+    health_status: 'حالة الخدمة',
+    service_alive: 'الخدمة نشطة',
+    service_ready: 'الخدمة جاهزة',
+    tenants: 'الجهات',
+    organizations: 'المنظمات',
+    projects: 'المشاريع',
+    documents: 'الوثائق',
+    evidence_links: 'روابط الأدلة',
+    audit_records: 'سجلات التدقيق',
+    create: 'إنشاء',
+    authorize: 'تفويض',
+    draft: 'مسودة',
+    authorized: 'مفوض',
+    archived: 'مؤرشف',
+    dismiss: 'إغلاق',
+  },
+  en: {
+    app_name: 'TAQADDUM',
+    health_status: 'Service status',
+    service_alive: 'Service alive',
+    service_ready: 'Service ready',
+    tenants: 'Tenants',
+    organizations: 'Organizations',
+    projects: 'Projects',
+    documents: 'Documents',
+    evidence_links: 'Evidence links',
+    audit_records: 'Audit records',
+    create: 'Create',
+    authorize: 'Authorize',
+    draft: 'Draft',
+    authorized: 'Authorized',
+    archived: 'Archived',
+    dismiss: 'Dismiss',
+  },
+} as const;
+
+export type Locale = keyof typeof messages;
+export type MessageKey = keyof typeof messages.fr;
+
+export function getDirection(locale: Locale): 'ltr' | 'rtl' {
+  return locale === 'ar' ? 'rtl' : 'ltr';
+}
