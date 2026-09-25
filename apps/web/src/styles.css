@@ -3,21 +3,32 @@
 }
 
 html {
-  font-family: var(--font-ui);
+  min-inline-size: 320px;
   background: var(--color-bg-canvas);
+  font-family: var(--font-ui);
 }
 
 body {
+  min-block-size: 100vh;
   margin: 0;
 }
 
 button,
 select,
-input {
+input,
+textarea {
   font: inherit;
 }
 
-:focus-visible {
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+a {
+  color: var(--color-action-primary);
 }

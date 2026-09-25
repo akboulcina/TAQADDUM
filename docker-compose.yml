@@ -20,7 +20,9 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     environment:
+      DATABASE_URL: postgresql://taqaddum:taqaddum_local_only@postgres:5432/taqaddum
       NODE_ENV: local
+      PGSSLMODE: "disable"
       APP_VERSION: 0.1.0
       PORT: 3000
     ports: ['3000:3000']
@@ -40,7 +42,9 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_BASE_URL: "https://zany-halibut-x55gvqwj95jrcvvj-3000.app.github.dev"
     environment:
-      VITE_API_BASE_URL: http://localhost:3000
+      VITE_API_BASE_URL: https://zany-halibut-x55gvqwj95jrcvvj-3000.app.github.dev
     ports: ['5173:80']
     depends_on: [api]
