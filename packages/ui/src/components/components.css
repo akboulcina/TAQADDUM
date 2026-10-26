@@ -1,0 +1,208 @@
+@import '@taqaddum/design-tokens/tokens.css';
+
+.ui-button,
+.ui-alert__dismiss {
+  font: inherit;
+}
+
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.ui-button:focus-visible,
+.ui-alert__dismiss:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.ui-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ui-button--sm {
+  min-block-size: var(--control-height-sm);
+  padding-inline: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.ui-button--md {
+  min-block-size: var(--control-height-md);
+  padding-inline: var(--space-4);
+  font-size: var(--font-size-md);
+}
+
+.ui-button--lg {
+  min-block-size: var(--control-height-lg);
+  padding-inline: var(--space-6);
+  font-size: var(--font-size-lg);
+}
+
+.ui-button--primary {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+}
+
+.ui-button--primary:hover:not(:disabled) {
+  background: var(--color-action-primary-hover);
+}
+
+.ui-button--secondary {
+  border-color: var(--color-border-default);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.ui-button--secondary:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+}
+
+.ui-button--tertiary {
+  background: transparent;
+  color: var(--color-action-secondary);
+}
+
+.ui-button--tertiary:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+}
+
+.ui-button--danger {
+  background: var(--color-action-danger);
+  color: var(--color-text-inverse);
+}
+
+.ui-button--danger:hover:not(:disabled) {
+  background: var(--color-action-danger-hover);
+}
+
+.ui-button__spinner {
+  inline-size: 1em;
+  block-size: 1em;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: var(--radius-pill);
+  animation: ui-spin 700ms linear infinite;
+}
+
+.ui-text {
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+}
+
+.ui-text--body-md,
+.ui-text--label-md {
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+}
+
+.ui-text--body-sm,
+.ui-text--label-sm {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.ui-text--label-md,
+.ui-text--label-sm {
+  font-weight: 600;
+}
+
+.ui-text--caption {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-tight);
+}
+
+.ui-status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  padding-block: 2px;
+  padding-inline: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.ui-status-badge--neutral {
+  background: var(--color-status-neutral-bg);
+  color: var(--color-status-neutral-fg);
+}
+
+.ui-status-badge--success {
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-fg);
+}
+
+.ui-status-badge--warning {
+  background: var(--color-status-warning-bg);
+  color: var(--color-status-warning-fg);
+}
+
+.ui-status-badge--danger,
+.ui-status-badge--restricted {
+  background: var(--color-status-danger-bg);
+  color: var(--color-status-danger-fg);
+}
+
+.ui-status-badge--info {
+  background: var(--color-status-info-bg);
+  color: var(--color-status-info-fg);
+}
+
+.ui-alert {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.ui-alert--info {
+  background: var(--color-status-info-bg);
+  color: var(--color-status-info-fg);
+}
+
+.ui-alert--warning {
+  background: var(--color-status-warning-bg);
+  color: var(--color-status-warning-fg);
+}
+
+.ui-alert--danger {
+  background: var(--color-status-danger-bg);
+  color: var(--color-status-danger-fg);
+}
+
+.ui-alert--success {
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-fg);
+}
+
+.ui-alert__dismiss {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.ui-alert__dismiss:hover {
+  opacity: 1;
+}
+
+@keyframes ui-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

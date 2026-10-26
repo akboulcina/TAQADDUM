@@ -1,0 +1,1 @@
+Runtime role policy: *_owner is migration-only; *_app receives explicit schema DML grants per migration; *_ro receives explicit read grants. Runtime roles receive no DDL, TRUNCATE, or cross-schema private-table access. taq_migrator is the deployment identity and should be NOLOGIN locally unless a controlled local role is configured.
