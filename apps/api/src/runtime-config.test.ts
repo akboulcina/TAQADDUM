@@ -21,19 +21,15 @@ test('origines personnalisées et doublons', () => {
   const result = readRuntimeConfig({
     DATABASE_URL: database,
     PORT: '3100',
-    CORS_ALLOWED_ORIGINS:
-      'https://frontend.example.invalid, https://frontend.example.invalid',
+    CORS_ALLOWED_ORIGINS: 'https://frontend.example.invalid, https://frontend.example.invalid',
   });
   expect(result.port).toBe(3100);
-  expect([...result.corsAllowedOrigins]).toEqual([
-    'https://frontend.example.invalid',
-  ]);
+  expect([...result.corsAllowedOrigins]).toEqual(['https://frontend.example.invalid']);
 });
 
 test('liste vide désactive les autorisations cross-origin', () => {
   expect(
-    readRuntimeConfig({ DATABASE_URL: database, CORS_ALLOWED_ORIGINS: '' })
-      .corsAllowedOrigins.size,
+    readRuntimeConfig({ DATABASE_URL: database, CORS_ALLOWED_ORIGINS: '' }).corsAllowedOrigins.size,
   ).toBe(0);
 });
 
@@ -57,9 +53,7 @@ test('origines avec chemin, joker ou credentials refusées', () => {
 
 test('ports et protocoles invalides refusés sans divulguer la valeur', () => {
   for (const port of ['0', '65536', '-1', '3000x', '']) {
-    expect(() =>
-      readRuntimeConfig({ DATABASE_URL: database, PORT: port }),
-    ).toThrow('PORT');
+    expect(() => readRuntimeConfig({ DATABASE_URL: database, PORT: port })).toThrow('PORT');
   }
   for (const url of ['not-a-url', 'https://localhost/database']) {
     expect(() => readRuntimeConfig({ DATABASE_URL: url })).toThrow(
@@ -69,10 +63,10 @@ test('ports et protocoles invalides refusés sans divulguer la valeur', () => {
 });
 
 test('production refusée avant durcissement complet', () => {
-  expect(() =>
-    readRuntimeConfig({ DATABASE_URL: database, NODE_ENV: 'production' }),
-  ).toThrow('Production désactivée');
-  expect(() =>
-    readRuntimeConfig({ DATABASE_URL: database, NODE_ENV: 'unknown' }),
-  ).toThrow('NODE_ENV invalide');
+  expect(() => readRuntimeConfig({ DATABASE_URL: database, NODE_ENV: 'production' })).toThrow(
+    'Production désactivée',
+  );
+  expect(() => readRuntimeConfig({ DATABASE_URL: database, NODE_ENV: 'unknown' })).toThrow(
+    'NODE_ENV invalide',
+  );
 });

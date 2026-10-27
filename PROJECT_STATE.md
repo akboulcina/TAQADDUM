@@ -33,14 +33,14 @@ Stale September project attachment must not overwrite this branch state.
   Unsupported files listed. Heuristic only, not history/general-token guarantee.
 - GitHub targeted scanner unavailable because Advanced Security not enabled; no
   subscription/visibility/security setting modified. Maintained scanner/history audit pending.
--4ef6d47 adds7 tests, read-only credential workflow (PR/main/work-branch push/manual),
+  -4ef6d47 adds7 tests, read-only credential workflow (PR/main/work-branch push/manual),
   docs/runbooks/credential-remediation.md. Owner confirmed7/7 and22 findings across
- 8files plus workbook scan-incomplete.
--90ba317 handles empty inlineStr/shared cells, validates indexes, adds Python/CSS/HTML/
+  8files plus workbook scan-incomplete.
+  -90ba317 handles empty inlineStr/shared cells, validates indexes, adds Python/CSS/HTML/
   conf/text/XML/dot-config coverage and exception-class-only errors (no messages).
   Owner confirmed10/10 tests and28 findings with no scan errors: original22 plus
- 6workbook cells sheet1 C2:C7. Only9 .gitkeep paths unsupported. Findings not unique secrets.
--903d157 replaces3 CI literals with TAQADDUM_CI_DB_PASSWORD; owner reports secret
+  6workbook cells sheet1 C2:C7. Only9 .gitkeep paths unsupported. Findings not unique secrets.
+  -903d157 replaces3 CI literals with TAQADDUM_CI_DB_PASSWORD; owner reports secret
   created. Expected remaining25 detections not yet confirmed by new full scan.
 - No workbook rewritten, passwords rotated or volumes removed. No broad suppressions.
   Source removal separate from real account rotation; POSTGRES_PASSWORD alone does
@@ -77,7 +77,7 @@ Stale September project attachment must not overwrite this branch state.
   reached bootstrap, proving install no longer blocked in that reported run.
 - Owner CI log11:01: public.users absent at20261027_project_monitoring.sql. Source
   verified FK dependencies on public.users/kpis/alert_rules created by
- 20261027_users_kpis_alerts.sql. Lexicographic glob ran dependent first.
+  20261027_users_kpis_alerts.sql. Lexicographic glob ran dependent first.
 - Current CI-only fix pre-applies users_kpis_alerts immediately before monitoring
   and skips its later glob occurrence. Other SQL files remain in normal glob order.
   No migration files renamed/edited, local DB not touched. Full fresh bootstrap

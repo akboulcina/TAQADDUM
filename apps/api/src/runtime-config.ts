@@ -4,17 +4,13 @@ export type RuntimeConfig = {
   corsAllowedOrigins: ReadonlySet<string>;
 };
 
-export function readRuntimeConfig(
-  env: Record<string, string | undefined>,
-): RuntimeConfig {
+export function readRuntimeConfig(env: Record<string, string | undefined>): RuntimeConfig {
   const mode = env['NODE_ENV'] ?? 'local';
   if (!['local', 'development', 'test', 'production'].includes(mode)) {
     throw new Error('NODE_ENV invalide');
   }
   if (mode === 'production') {
-    throw new Error(
-      'Production désactivée tant que les contrôles Release 0.5 ne sont pas validés',
-    );
+    throw new Error('Production désactivée tant que les contrôles Release 0.5 ne sont pas validés');
   }
   const databaseUrl = env['DATABASE_URL']?.trim();
   if (!databaseUrl) {
@@ -38,9 +34,7 @@ export function readRuntimeConfig(
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error('PORT invalide');
   }
-  const origins =
-    env['CORS_ALLOWED_ORIGINS'] ??
-    'http://localhost:5173,http://127.0.0.1:5173';
+  const origins = env['CORS_ALLOWED_ORIGINS'] ?? 'http://localhost:5173,http://127.0.0.1:5173';
   const corsAllowedOrigins = new Set<string>();
   for (const entry of origins.split(',').map((value) => value.trim())) {
     if (!entry) continue;

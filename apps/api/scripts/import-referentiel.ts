@@ -5,10 +5,7 @@ import * as path from 'path';
 const require = createRequire(import.meta.url);
 const XLSX = require('xlsx');
 
-const file = path.resolve(
-  process.cwd(),
-  '../../database/seed/TAQADDUM_import_ready.xlsx',
-);
+const file = path.resolve(process.cwd(), '../../database/seed/TAQADDUM_import_ready.xlsx');
 
 const workbook = XLSX.readFile(file);
 
@@ -45,10 +42,7 @@ async function main() {
   }
 
   for (const u of users) {
-    const role = await client.query(
-      'SELECT id FROM roles WHERE code = $1',
-      [u.role_code],
-    );
+    const role = await client.query('SELECT id FROM roles WHERE code = $1', [u.role_code]);
 
     if (role.rowCount === 0) continue;
 
@@ -99,11 +93,26 @@ async function main() {
         source_tables = EXCLUDED.source_tables,
         justification = EXCLUDED.justification`,
       [
-        k.KPI_ID, k.Famille, k.Nom_KPI, k.Importance, k.Phase, k.Calculabilité,
-        k.Définition, k.Formule, k.Unité, k.Sens,
-        toNumber(k.Seuil_Vert), toNumber(k.Seuil_Rouge),
-        k.Vert, k.Orange, k.Rouge, k.Alimenté_par, k.Responsable,
-        k.Fréquence_cible, k.Tables_sources, k.Justification_importance,
+        k.KPI_ID,
+        k.Famille,
+        k.Nom_KPI,
+        k.Importance,
+        k.Phase,
+        k.Calculabilité,
+        k.Définition,
+        k.Formule,
+        k.Unité,
+        k.Sens,
+        toNumber(k.Seuil_Vert),
+        toNumber(k.Seuil_Rouge),
+        k.Vert,
+        k.Orange,
+        k.Rouge,
+        k.Alimenté_par,
+        k.Responsable,
+        k.Fréquence_cible,
+        k.Tables_sources,
+        k.Justification_importance,
       ],
     );
   }
@@ -128,25 +137,28 @@ async function main() {
         change_note = EXCLUDED.change_note
       RETURNING id`,
       [
-        a.Regle_ID, a.Nom, a.Niveau, a.Importance, a.Phase,
-        a['Condition (lisible)'], a.Logique, a.Destinataire, a.Action,
-        a.Fréquence, a.Origine, a["Changement par rapport à l'ancienne règle"],
+        a.Regle_ID,
+        a.Nom,
+        a.Niveau,
+        a.Importance,
+        a.Phase,
+        a['Condition (lisible)'],
+        a.Logique,
+        a.Destinataire,
+        a.Action,
+        a.Fréquence,
+        a.Origine,
+        a["Changement par rapport à l'ancienne règle"],
       ],
     );
 
     const alertId = result.rows[0].id;
 
-    await client.query(
-      'DELETE FROM alert_conditions WHERE alert_rule_id = $1',
-      [alertId],
-    );
+    await client.query('DELETE FROM alert_conditions WHERE alert_rule_id = $1', [alertId]);
   }
 
   for (const c of alertConditions) {
-    const rule = await client.query(
-      'SELECT id FROM alert_rules WHERE rule_id = $1',
-      [c.Regle_ID],
-    );
+    const rule = await client.query('SELECT id FROM alert_rules WHERE rule_id = $1', [c.Regle_ID]);
 
     if (rule.rowCount === 0) continue;
 

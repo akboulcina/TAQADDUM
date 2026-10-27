@@ -14,12 +14,8 @@ test('seuils AV2 inclus côté meilleur niveau', () => {
     elapsedDays: 100,
     currentDurationDays: 100,
   };
-  expect(
-    calculate({ ...common, performedValue: 90 }).kpis['AV2']?.status,
-  ).toBe('green');
-  expect(
-    calculate({ ...common, performedValue: 70 }).kpis['AV2']?.status,
-  ).toBe('orange');
+  expect(calculate({ ...common, performedValue: 90 }).kpis['AV2']?.status).toBe('green');
+  expect(calculate({ ...common, performedValue: 70 }).kpis['AV2']?.status).toBe('orange');
 });
 
 test('délai non plafonné et trois règles déclenchées', () => {
@@ -42,9 +38,7 @@ test('délai non plafonné et trois règles déclenchées', () => {
 });
 
 test('zéro au dénominateur et temps nul restent non calculables', () => {
-  expect(
-    calculate({ performedValue: 0, totalEstimatedCost: 0 }).kpis['AV1']?.value,
-  ).toBeNull();
+  expect(calculate({ performedValue: 0, totalEstimatedCost: 0 }).kpis['AV1']?.value).toBeNull();
   expect(
     calculate({
       performedValue: 10,
