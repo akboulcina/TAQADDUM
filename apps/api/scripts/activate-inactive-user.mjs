@@ -1,3 +1,6 @@
+import { Buffer } from 'node:buffer';
+import console from 'node:console';
+import process from 'node:process';
 import { readFileSync } from 'node:fs';
 import { Client } from 'pg';
 
