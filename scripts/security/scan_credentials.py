@@ -7,7 +7,12 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 NS = {"s": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
-TEXT_SUFFIXES = {".ts", ".tsx", ".js", ".mjs", ".cjs", ".json", ".yaml", ".yml", ".sql", ".sh", ".md", ".toml", ".ini", ".env", ".example"}
+TEXT_SUFFIXES = {
+    ".ts", ".tsx", ".js", ".mjs", ".cjs", ".json", ".yaml", ".yml",
+    ".sql", ".sh", ".md", ".toml", ".ini", ".env", ".example", ".py",
+    ".css", ".html", ".conf", ".txt", ".csv", ".xml",
+}
+TEXT_NAMES = {"Dockerfile", "Makefile", ".gitignore", ".editorconfig"}
 PATTERNS = [
     ("credential-in-url", re.compile(r"(?:postgres(?:ql)?|mysql|redis)://[^\s:/]+:[^\s@]+@", re.I)),
     ("literal-password-hash-input", re.compile(r"\bcrypt\s*\(\s*'[^']+'", re.I)),
@@ -31,6 +36,21 @@ def findings_text(text):
     return found
 
 
+def cell_text(cell, shared):
+    value = cell.findtext("s:v", default="", namespaces=NS)
+    if cell.attrib.get("t") == "s":
+        if not value.strip():
+            return ""
+        index = int(value)
+        if index < 0 or index >= len(shared):
+            raise ValueError("invalid-shared-string-index")
+        return shared[index]
+    if cell.attrib.get("t") == "inlineStr":
+        inline = cell.find("s:is", NS)
+        return "" if inline is None else "".join(inline.itertext())
+    return value
+
+
 def findings_workbook(source):
     found = []
     with zipfile.ZipFile(source) as archive:
@@ -50,11 +70,7 @@ def findings_workbook(source):
                 for cell in row.findall("s:c", NS):
                     address = cell.attrib.get("r", "")
                     column = re.sub(r"[0-9]", "", address)
-                    value = cell.findtext("s:v", default="", namespaces=NS)
-                    if cell.attrib.get("t") == "s":
-                        value = shared[int(value)]
-                    elif cell.attrib.get("t") == "inlineStr":
-                        value = "".join(cell.find("s:is", NS).itertext())
+                    value = cell_text(cell, shared)
                     label = re.sub(r"[^a-z]", "", value.lower())
                     if label in {"password", "motdepasse", "apikey", "clientsecret", "accesstoken", "refreshtoken"}:
                         sensitive_columns[column] = int(row.attrib.get("r", "0"))
@@ -75,14 +91,14 @@ def scan(root, paths):
                 raise ValueError("tracked-file-unavailable")
             if path.suffix.lower() in {".xlsx", ".xlsm"}:
                 entries = findings_workbook(path)
-            elif path.suffix.lower() in TEXT_SUFFIXES or path.name in {"Dockerfile", "Makefile"}:
+            elif path.suffix.lower() in TEXT_SUFFIXES or path.name in TEXT_NAMES:
                 entries = findings_text(path.read_text(encoding="utf-8"))
             else:
                 skipped.append(relative)
                 continue
             found.extend({"path": relative, **entry} for entry in entries)
-        except Exception:
-            errors.append({"path": relative, "kind": "scan-incomplete"})
+        except Exception as error:
+            errors.append({"path": relative, "kind": "scan-incomplete", "error_type": type(error).__name__})
     return {"findings": found, "errors": errors, "unsupported_paths": skipped, "scope": "tracked working-tree text and OOXML credential columns; no Git history or arbitrary token guarantee"}
 
 
