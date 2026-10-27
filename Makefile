@@ -50,27 +50,28 @@ db-check:
 		-d $(DB_NAME) \
 		-v ON_ERROR_STOP=1 < database/verification/check-audit-platform.sql
 
+# Host-side DB tests require an exported DATABASE_URL.
 test:
-	DATABASE_URL="postgresql://$(DB_USER):$(DB_USER)@localhost:5432/$(DB_NAME)" \
+	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
 		sh database/tests/db-tests.sh
-	DATABASE_URL="postgresql://$(DB_USER):$(DB_USER)@localhost:5432/$(DB_NAME)" \
+	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
 		sh database/tests/identity-org-tests.sh
-	DATABASE_URL="postgresql://$(DB_USER):$(DB_USER)@localhost:5432/$(DB_NAME)" \
+	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
 		sh database/tests/audit-platform-tests.sh
 
 test-audit:
-	DATABASE_URL="postgresql://$(DB_USER):$(DB_USER)@localhost:5432/$(DB_NAME)" \
+	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
 		sh database/tests/audit-platform-tests.sh
 
 test-outbox:
-	DATABASE_URL="postgresql://$(DB_USER):$(DB_USER)@localhost:5432/$(DB_NAME)" \
+	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
 		sh database/tests/outbox-tests.sh
 
+# This URL must be reachable from inside the PostgreSQL container.
 test-documents:
-	docker compose exec -T $(DB_SERVICE) \
-		env DATABASE_URL="postgresql://$(DB_USER):$(DB_USER)@localhost:5432/$(DB_NAME)" \
+	@docker compose exec -T $(DB_SERVICE) \
+		env DATABASE_URL="$${DOCUMENTS_DATABASE_URL:?DOCUMENTS_DATABASE_URL is required}" \
 		sh -s < database/tests/documents-tests.sh
-		sh database/tests/documents-tests.sh
 
 .PHONY: storybook
 

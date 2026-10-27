@@ -134,3 +134,12 @@ Stale September project attachment must not overwrite this branch state.
 - Importer connection fallback removed locally: DATABASE_URL is now mandatory.
   Patch verification and publication pending. No import executed, database account
   changed, workbook rewritten or live password rotated by this operation.
+
+## Makefile credential cleanup — 2026-10-27
+
+- Owner verified importer patch: typecheck/format passed, scan down to24 findings.
+- Makefile test targets now require exported DATABASE_URL rather than embedded
+  credentials. Docker documents target requires DOCUMENTS_DATABASE_URL reachable
+  from inside its container; duplicate host invocation removed.
+- Local patch only; validation pending. No database tests, migration, import,
+  workbook rewrite or credential rotation performed by this edit.
