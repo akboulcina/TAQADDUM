@@ -1,0 +1,11 @@
+apis:
+  taqaddum@v1:
+    root: contracts/openapi/openapi.yaml
+
+rules:
+  no-invalid-schema-examples: error
+  no-unused-components: error
+  operation-operationId: error
+  path-params-defined: error
+  response-contains-property: error
+  operation-4xx-response: off
