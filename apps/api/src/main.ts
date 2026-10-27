@@ -189,23 +189,24 @@ const server = createServer(async (request, response) => {
   ]);
 
   const requestOrigin = header(request, 'origin');
+  const allowedOrigin =
+    requestOrigin === 'https://zany-halibut-x55gvqwj95jrcvvj-5173.app.github.dev' ||
+    requestOrigin === 'http://localhost:5173' ||
+    requestOrigin === 'http://127.0.0.1:5173';
 
-  if (requestOrigin && allowedOrigins.has(requestOrigin)) {
+  if (allowedOrigin && requestOrigin) {
     response.setHeader('access-control-allow-origin', requestOrigin);
     response.setHeader('vary', 'Origin');
-    response.setHeader('access-control-allow-credentials', 'true');
   }
 
   response.setHeader(
     'access-control-allow-methods',
     'GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS',
   );
-
   response.setHeader(
     'access-control-allow-headers',
     'Content-Type, Authorization, Accept, X-Tenant-Id, X-Organization-Id, X-Actor-Id, Idempotency-Key',
   );
-
   response.setHeader('access-control-max-age', '600');
 
   if (request.method === 'OPTIONS') {

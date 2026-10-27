@@ -21,7 +21,7 @@ ACTOR=$(psql "$DATABASE_URL" -Atc "SELECT id FROM identity.users WHERE email='ad
 : "${ORG:?demo organization fixture is missing}"
 : "${ACTOR:?admin fixture is missing}"
 
-RECORD_ID=$(psql "$DATABASE_URL" -Atc "
+RECORD_ID=$(psql -q "$DATABASE_URL" -Atc "
   INSERT INTO audit.audit_records (
     tenant_id, organization_id, actor_type, actor_id, action, action_code,
     target_context, target_aggregate_type, target_aggregate_id, outcome,
