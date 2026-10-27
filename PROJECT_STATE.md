@@ -1,127 +1,129 @@
 # PROJECT_STATE.md
 
-Updated: 2026-10-27. Technical source of truth. Business source: original
-TAQADDUM 43-KPI workbook (v1, 12/10/2026); public distribution not approved yet.
-Master Build Prompt v2 is the target brief, not evidence of implemented features.
+Updated: 2026-10-27. Technical source of truth. Master Build Prompt v2 describes
+targets, not implemented functionality. Owner explicitly authorized public
+publication of the ORIGINAL 43-KPI referential workbook on 2026-10-27 at 09:59
+Africa/Algiers. This does not authorize passwords, tokens, user credential
+workbooks or future confidential records. Preserve this scoped decision.
 
-## Baseline and preserved environment
+## Baseline and environment
 
-- Work branch feature/import-ready-data; audited baseline HEAD
-  6f7fcb15341324105ec6d78173f27a347f34f464, confirmed by GitHub get_commit.
-- User reports branch 63 commits ahead of main and 7/7 node:test cases passing;
-  ahead count and test execution were not independently reproduced here.
-- Codespaces previously used Node 24.21.0; inspected root engines is >=22 <23,
-  packageManager pnpm@9.15.5, CI Node 22. Target Node 22 across CI/Codespaces,
-  pnpm sole package manager; environment reconciliation pending. Both lockfiles exist.
-- PostgreSQL 16.10/PostGIS in Compose, database/user taqaddum, container
-  taqaddum-postgres-1; host psql unavailable. API local 3000, React/Vite web 5173.
-  MinIO and worker exist; no framework or port replacement in this delivery.
-- DATABASE_URL required for eventual hardened deployment. Historical local
-  connection defaults and exposed demo passwords require coordinated removal
-  and rotation; do not copy them into new code or docs.
-- Preserve local backend/frontend, Docker PostgreSQL, relative /v1 and /health
-  and Vite proxy to 127.0.0.1:3000. Docker hostname postgres only in Docker.
-  No parallel local/Docker API. restart-taqaddum.sh remains unverified.
+- Work branch feature/import-ready-data. Audited baseline 6f7fcb1; first Release
+  0.5 commit 96c0baea6a541b2aa1fdc4cf50255f9c31053d9c contains Vitest port and ADRs.
+- User reported 63 commits ahead of main and 7/7 original node:test cases passing;
+  neither recounted nor rerun by connector. No current CI success verified.
+- Root engines >=22 <23, pnpm@9.15.5; CI Node22. Codespaces previously Node24.21.0
+  and npm; reconcile to Node22/pnpm pending. Both lockfiles exist.
+- PostgreSQL16.10/PostGIS Compose, database/user taqaddum, container
+  taqaddum-postgres-1. No host psql; docker exec available. Local API3000, Vite5173.
+  Keep Docker PostgreSQL, local hot-reload frontend/backend and relative /v1,/health
+  proxy to 127.0.0.1:3000. postgres hostname only for Docker services. Never launch
+  duplicate local and Docker APIs. MinIO/worker present but not needed currently.
 
-## Existing business pipeline and UI
+## Runtime configuration delivery
 
-- User confirmed prior import counts: 6 users, 6 roles, 43 KPI records,
-  22 rule rows, 39 conditions. Workbook has 17 actual rules AL01-AL17;
-  note rows likely explain excess. Do not equate count with integrity.
-- Commits: storage 6dd1abb; engine 5f20999; backend a7bfdf1; initial pilot UI
-  85db866; restored original dashboard shell plus monitoring integration 6f7fcb1.
-- User reported successful MO submission on project 0052. Earlier user HTTP
-  checks returned health/database ready and project 0052 draft. Earlier PRJ
-  fixtures not confirmed in that context. No independent browser/e2e run here.
-- Preserve assigned MO submission, separate PMO validation, row lock and
-  transaction, repeat validation 409, immutable dated snapshots/version/evidence.
-  Pilot computes AV1 AV2 DL1 DL2 QR1; AL02 AL06 AL13. Missing is unknown, not 0
-  or false; empty alerts not proof of safety; provisional hardcoded thresholds
-  remain until database-driven differential tests pass.
-- Technical 31-day pilot freshness is not official CNED policy. Extend into
-  DO1-DO3 confidence gating and AL16 without silently changing frozen history.
-- Monitoring results visible to Direction: AV2 DL2 QR1 and three supported
-  alert types, not raw sources. Existing MO/PMO hardcoded role checks are baseline
-  behavior to test before permission-matrix generalization.
-- Optional demo-members SQL targets exact existing project 0052 and separate
-  demo MO/PMO accounts, preserves conflicts. Application not independently verified.
-- Restore/preserve original shell, @taqaddum/ui, demo.css, 13-entry navigation,
-  overview, catalogs, creation modal, FR/AR/EN selector. MonitoringPanel is added,
-  not a parallel app; monitoring-integration.css scoped. No fabricated audit data.
-- Terrain/GIS is an honest placeholder, not a functioning map. Snapshot display
-  refreshes every 30 seconds; calculations are not yet recalculated daily.
+- runtime-config.ts validates required DATABASE_URL (no embedded fallback), PORT,
+  NODE_ENV and exact CORS_ALLOWED_ORIGINS. No credential values printed by parser.
+- main.ts consumes parser; removes hardcoded Codespaces origin and API default DB
+  password. Default non-production CORS allowlist only localhost/127.0.0.1:5173;
+  explicit empty list permits no cross-origin origins. Same-origin proxy requests
+  are not rejected for an unlisted Origin. CORS is NOT authorization or CSRF protection.
+- NODE_ENV=production explicitly refuses startup until Release0.5 security gates
+  are implemented. Other modes remain private-demo only. No bypass flag introduced.
+- .env.example has no password, blank DATABASE_URL and documentation. It is not
+  auto-loaded: supply DATABASE_URL via shell or Codespaces secret before npm/pnpm
+  dev. .gitignore already excludes .env and .env.* except .env.example.
+- Existing exported DATABASE_URL continues to work. No database password rotation,
+  account reset, schema mutation, route-contract change or frontend change in this lot.
+- Seven configuration test cases supplied; not executed. Run from repo root:
+  pnpm exec vitest run apps/api/src/runtime-config.test.ts
+  apps/api/src/monitoring-engine.test.ts (one command listing both paths).
+- Runtime config is only PART of H3. Compose, CI, seed/migration scripts and Excel
+  credential copies still contain legacy shared credentials and/or old origins.
+  Do not mark secrets removed or rotated. Secret scanning and coordinated rotation
+  remain pending. Removing source text does not erase history or rotate a live DB.
+- Updating POSTGRES_PASSWORD alone does not rotate an initialized PostgreSQL
+  volume; never delete the volume as a shortcut. Back up and coordinate rotation
+  with all clients. restart-taqaddum.sh must be audited before calling it safe.
 
-## Audit evidence and additional blockers
+## Preserved functionality and evidence
 
-- Root package scripts: Vitest tests, Prettier, ESLint, tsc build, boundaries,
-  OpenAPI lint/bundle and test:contract. Presence is not proof of green results.
-- PR workflow inspected: pull_request only, Node 22, pnpm frozen install,
-  PostGIS service, bootstrap/migration/fixture glob loops, audit-platform DB test,
-  format/lint/typecheck/test/boundaries/Compose/build. OpenAPI lint is not an
-  explicit step; other DB suites are not directly invoked by the inspected YAML.
-- Critical fresh-install dependency: monitoring SQL alphabetically precedes
-  public identity/referential SQL. Two 0004 files also exist. No ledger in that loop.
-- Vitest includes all *.test.ts/tsx with global jsdom. Node engine tests therefore
-  need Vitest registration and explicit Node environment, not merely a green CLI run.
-- identity.sessions already exists with token hash, expiry and revocation. Reuse it.
-  identity.users tenant RLS only checks a non-NULL setting in 0003: insufficient
-  membership isolation. org.memberships uniqueness allows one row per scoped user;
-  scoped multiple roles need explicit design. Existing canonical users lack a
-  credential field in inspected migration; inspect references before convergence.
-- ADR-001 says NestJS/Fastify. Inspected API package has neither runtime dependency,
-  only @fastify/cors, pg and xlsx. Runtime node:http retained pending migration.
-- Attachment PROJECT_STATE.md in Perplexity is dated September and stale relative
-  to GitHub; do not overwrite this branch state from that attachment.
+- Import user-reported counts 6 users,6 roles,43 KPI,22 rule rows,39 conditions;
+  17 true AL01-AL17 rules in workbook. Counts not content verification; extra rows
+  likely notes. Prior numeric-only import lost textual thresholds; do not delete
+  data automatically. Catalog UI masks notes but DB audit still required.
+- Storage6dd1abb; engine5f20999; backend a7bfdf1; UI85db866; restored visual shell
+  6f7fcb1. User reported MO submission success on demo0052. Prior health/database
+  checks HTTP200, project0052 draft. Other fixture projects not confirmed in context.
+- Preserve MO submit, separate assigned PMO validation, row lock/transaction,
+  no self-validation, repeat409, immutable snapshots/calculationVersion/evidence.
+- Pilot AV1 AV2 DL1 DL2 QR1; AL02 AL06 AL13. Missing not zero/false, explicit
+  noncalculable and tri-state alerts. Provisional hardcoded thresholds remain as
+  regression oracle until DB-driven differential tests pass. Freshness31 days is
+  technical policy, not CNED official cadence; DO1-DO3/AL16 gating pending.
+- Direction snapshot subset AV2 DL2 QR1 and supported alerts, not raw submissions;
+  explicit memberships for MO/PMO. Role checks still hardcoded baseline.
+- Optional demo-members seed targets exact0052/id2d5bfd77-c6d7-4f0e-bf5a-de2e1056cf81
+  and separate MO/PMO demo accounts, preserves conflicts. No independent seed or
+  migration application verification. No connector-run browser/e2e tests.
+- Preserve original @taqaddum/ui shell, demo.css,13 navigation entries, overview,
+  table/create modal, catalogs, FR/AR/EN controls and scoped integration CSS.
+  MonitoringPanel added inside app, not replacement. No fabricated audit events.
+  Terrain/GIS placeholder only. Display polling30sec, not daily recomputation.
 
-## Release 0.5 first change set
+## Audit and ADRs
 
-- Ported monitoring-engine.test.ts from node:test/assert to Vitest test/expect,
-  preserving seven original cases and explicit @vitest-environment node.
-  No engine, threshold, route, UI, schema or data mutation in this change set.
-- Added ADR-003 Fastify modular monolith (supersedes NestJS choice, implementation
-  pending), ADR-004 canonical identity/org convergence, ADR-005 node-pg-migrate
-  ledger with ordered legacy baseline. Decisions are not implementation claims.
-- Next verification in a real checkout: pnpm exec vitest run
-  apps/api/src/monitoring-engine.test.ts; pnpm test; format/lint/typecheck/build.
-  No CI or local test executed by connector. CI result must be linked before green.
-- No PR/issue/branch protection/secret rotation/repository-visibility change
-  performed by this change set. These require their own resolved approved actions.
+- ADR003 accepted target Fastify modular monolith + Zod + pg.Pool, supersedes NestJS
+  choice. ADR004 canonical identity/org + existing identity.sessions. ADR005
+  node-pg-migrate ledger and explicit legacy baseline. Implementations pending.
+- Root Vitest includes *.test.ts/tsx with jsdom default. Engine's seven cases now
+  Vitest/expect with @vitest-environment node in96c0bae. No engine semantics change.
+- PR workflow pull_request only, Node22/pnpm frozen install, DB bootstrap/migration/
+  fixtures glob loops, audit-platform tests, format/lint/typecheck/test/boundaries/
+  Compose/build. OpenAPI lint exists as root script, not explicit CI step. Other
+  DB suites not explicitly called there. No CI run observed by connector.
+- Critical clean-install order: monitoring SQL sorts before prerequisite public
+  tables; two0004 migrations; no ledger in current CI loop. Do not replay blindly.
+- identity.sessions already has token hash/expiry/revocation; use it. identity.users
+  historical RLS checks only non-NULL tenant setting, insufficient authorization.
+  org.memberships uniqueness one row per scoped user requires multi-role design;
+  canonical identity migration inspected lacks credentials field. Inventory FKs.
+- Actual API still node:http; @fastify/cors present but no Fastify/Nest runtime
+  dependency. Pool migration and contracts remain to implement.
+- Perplexity attachment PROJECT_STATE.md dated September is stale. Do not replace
+  this GitHub state with it. Business source original referential v1 12/10/2026.
 
-## Delivery order and acceptance
+## Release0.5 next steps and gates
 
-- Contain public data/secrets; rotate disclosed credentials; never assume deleting
-  source erases Git history. Owner to confirm public workbook permission.
-- Establish CI baseline/Node 22/pnpm, legacy migration dependency/ledger rehearsals,
-  typed referential and R/S/V D/I imports, identity/scopes/sessions and deny-by-default
-  APIs, Fastify plugin migration/contract tests, router/query/module registry,
-  FR/AR behavior parity and doctor/runbook. Preserve old audit/outbox/RLS tests.
-- Release 0.5 gate: green CI on PR to main; no unauthenticated business endpoint;
-  canonical identity and compatibility validated; versioned typed referential with
-  rights; migration ledger; security negative tests; no production demo/mock auth.
-- Release 1 after hardening: rights-aware KPI center; DB-configured Wave A/golden
-  tests; factual geolocation editor and MapLibre; computed Direction cockpit and
-  project 360; alert lifecycle/MVP nine rules; PMO data quality; scoped immutable
-  reports. Do not build synthetic demo figures as CNED reality.
-- Preserve two delays, uncapped consumption, adjusted/current/delegated AE distinction,
-  consolidated works including terminated/parachèvement and separate advances.
-  Active means neither completed nor received; current authorized UI counter is
-  administrative, not this business definition. CO1/CO6 provisional weights off.
-- No coordinates invented; no external map token required. Wilaya list/licence and
-  actual geo inputs await owner confirmation. No claim that 43 KPI execute today.
-- Formula execution uses reviewed pure functions and versioned config, not eval of
-  workbook text. Typed conditions need number/string/boolean/null and missing-vs-null
-  semantics. H6 in the supplied prompt is truncated after 'value_type ∈ number';
-  acceptance must be derived from the remaining detailed brief, not invented text.
+- Finish H3 secret inventory/scanning/seed cleanup and coordinated rotation without
+  changing real data or authorizations implicitly. Public-original workbook allowed.
+- Node22/pnpm reproducibility and observed tests; ledger/baseline rehearsals;
+  typed referential with R/S/V D/I imports; canonical identity/scopes/sessions;
+  deny-by-default business APIs and RLS using actual least-privileged runtime role;
+  Fastify plugin migration/contract tests; router/query/module registry preserving
+  UI; FR/AR parity; doctor and verified runbook. Preserve audit/outbox tests.
+- Gate: green PR to main; no unauthenticated business API; canonical identity
+  compatibility tested; typed/versioned referential+rights; ledger; scope-negative
+  tests; no production mock/demo auth. No PR, protected-main change, visibility
+  change or credential rotation performed by connector so far.
+- Release1 vertical slices after hardening: rights-aware KPI center; DB-driven
+  WaveA/golden tests; PostGIS editor/MapLibre without invented coordinates;
+  computed cockpit+project360;9 MVP alert lifecycle rules;PMO data quality;reports.
+- Preserve uncapped delay/two durations, adjusted/current/delegated AE, consolidated
+  works including terminated/parachèvement, separate advances, active neither
+  completed nor received. Authorized UI count is administrative, not active KPI.
+- CO1/CO6 flags off until weights validated. Wilaya list/licence and actual geo
+  input sources await owner; no hardcoded administrative count. No eval of workbook
+  formulas. Typed conditions number/string/boolean/null and missing distinction.
+  H6 prompt text truncated; infer acceptance from detailed sections, not missing text.
 
-## Security and operating precautions
+## Operating precautions
 
-- Current sessions in memory without expiry/revocation; old project APIs unauthenticated;
-  catalogs not role filtered; Direction can select context without full account scope.
-  Monitoring tables have no demonstrated tenant RLS coverage. Private demo only,
-  no confidential real data until hardening. Passwords must be rotated separately.
-- Keep privileged database owner/bootstrap distinct from least-privileged runtime.
-  FORCE RLS or tested ownership strategy required; tests must use actual app role.
-- No TRUNCATE/reset/forced checkout/broad git add/deletion of local edits.
-  curl --max-time; no TypeScript in Bash; standalone heredoc delimiters.
-- GitHub connector reads/writes code; it does not execute Codespaces commands or
-  CI tests. Keep repository evidence, owner reports and executable results distinct.
+- Existing sessions still in-memory/no expiry/revocation; project APIs unauthenticated,
+  catalogs not rights-filtered, Direction context not full account/tenant model;
+  monitoring tenant RLS coverage not demonstrated. Private demo only; no real
+  confidential data until hardening. Config changes do not solve these gaps.
+- No TRUNCATE/reset/forced checkout/broad git add/deletion of local edits or volumes.
+  curl --max-time; no TypeScript pasted in Bash; standalone heredoc terminators.
+- Connector reads/writes GitHub, not Codespaces commands/tests. Separate source
+  inspection, owner reports, pushed commits, applied migrations and runtime proof.

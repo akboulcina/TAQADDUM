@@ -2,8 +2,9 @@ import { randomUUID } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { Client } from 'pg';
 import { monitoringRoute } from './monitoring-routes.js';
-const port = Number(process.env['PORT'] ?? 3000);
-const databaseUrl = process.env['DATABASE_URL'] ?? 'postgresql://taqaddum:taqaddum_local_only@127.0.0.1:5432/taqaddum';
+import { readRuntimeConfig } from './runtime-config.js';
+const config = readRuntimeConfig(process.env);
+const { port, databaseUrl } = config;
 let client = new Client({ connectionString: databaseUrl });
 let isClientConnected = false;
 const sessions = new Map<string, { userId: string; email: string; roleCode: string; roleName: string }>();
@@ -81,7 +82,8 @@ async function createProject(request: IncomingMessage,response: ServerResponse) 
 }
 const server=createServer(async(request,response)=>{
   const origin=header(request,'origin');
-  if(origin && ['https://zany-halibut-x55gvqwj95jrcvvj-5173.app.github.dev','http://localhost:5173','http://127.0.0.1:5173'].includes(origin)) { response.setHeader('access-control-allow-origin',origin); response.setHeader('vary','Origin'); }
+  if(origin) response.setHeader('vary','Origin');
+  if(origin && config.corsAllowedOrigins.has(origin)) response.setHeader('access-control-allow-origin',origin);
   response.setHeader('access-control-allow-methods','GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS');
   response.setHeader('access-control-allow-headers','Content-Type, Authorization, Accept, X-Tenant-Id, X-Organization-Id, X-Actor-Id, Idempotency-Key'); response.setHeader('access-control-max-age','600');
   if(request.method==='OPTIONS') { response.writeHead(204); response.end(); return; }
