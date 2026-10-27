@@ -143,3 +143,12 @@ Stale September project attachment must not overwrite this branch state.
   from inside its container; duplicate host invocation removed.
 - Local patch only; validation pending. No database tests, migration, import,
   workbook rewrite or credential rotation performed by this edit.
+
+## DB test credential cleanup — 2026-10-27
+
+- Owner pushed Makefile cleanup as5c2d425 after four missing-configuration
+  guard checks and format/diff checks succeeded. Scan previously down to18 findings.
+- Three DB test scripts now require DATABASE_URL without embedded fallback.
+  Makefile invokes these Bash scripts with bash, preserving pipefail compatibility.
+- Local patch validation pending. No real database tests, migration, import,
+  workbook rewrite or live credential rotation executed by this edit.

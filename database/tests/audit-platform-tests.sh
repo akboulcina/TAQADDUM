@@ -1,7 +1,7 @@
 
 #!/usr/bin/env bash
 set -euo pipefail
-: "${DATABASE_URL:=postgresql://taqaddum:taqaddum_local_only@localhost:5432/taqaddum}"
+: "${DATABASE_URL:?DATABASE_URL is required}"
 
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
 DO $$

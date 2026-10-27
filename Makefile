@@ -53,15 +53,15 @@ db-check:
 # Host-side DB tests require an exported DATABASE_URL.
 test:
 	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
-		sh database/tests/db-tests.sh
+		bash database/tests/db-tests.sh
 	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
-		sh database/tests/identity-org-tests.sh
+		bash database/tests/identity-org-tests.sh
 	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
-		sh database/tests/audit-platform-tests.sh
+		bash database/tests/audit-platform-tests.sh
 
 test-audit:
 	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
-		sh database/tests/audit-platform-tests.sh
+		bash database/tests/audit-platform-tests.sh
 
 test-outbox:
 	@DATABASE_URL="$${DATABASE_URL:?DATABASE_URL is required}" \
