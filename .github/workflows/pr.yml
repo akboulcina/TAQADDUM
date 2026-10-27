@@ -41,6 +41,15 @@ jobs:
             psql -v ON_ERROR_STOP=1 -f "$script"
           done
           for migration in database/migrations/*.sql; do
+            case "$migration" in
+              database/migrations/20261027_users_kpis_alerts.sql)
+                continue
+                ;;
+              database/migrations/20261027_project_monitoring.sql)
+                echo "Applying prerequisite database/migrations/20261027_users_kpis_alerts.sql"
+                psql -v ON_ERROR_STOP=1 -f database/migrations/20261027_users_kpis_alerts.sql
+                ;;
+            esac
             echo "Applying $migration"
             psql -v ON_ERROR_STOP=1 -f "$migration"
           done
