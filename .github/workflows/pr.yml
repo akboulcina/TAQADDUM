@@ -9,7 +9,7 @@ jobs:
         env:
           POSTGRES_DB: taqaddum
           POSTGRES_USER: taqaddum
-          POSTGRES_PASSWORD: taqaddum_local_only
+          POSTGRES_PASSWORD: ${{ secrets.TAQADDUM_CI_DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -29,7 +29,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Bootstrap database
         env:
-          PGPASSWORD: taqaddum_local_only
+          PGPASSWORD: ${{ secrets.TAQADDUM_CI_DB_PASSWORD }}
           PGHOST: localhost
           PGPORT: 5432
           PGUSER: taqaddum
@@ -50,7 +50,7 @@ jobs:
           done
       - name: Database audit tests
         env:
-          DATABASE_URL: postgresql://taqaddum:taqaddum_local_only@localhost:5432/taqaddum
+          DATABASE_URL: postgresql://taqaddum:${{ secrets.TAQADDUM_CI_DB_PASSWORD }}@localhost:5432/taqaddum
         run: bash database/tests/audit-platform-tests.sh
       - run: pnpm format:check
       - run: pnpm lint
