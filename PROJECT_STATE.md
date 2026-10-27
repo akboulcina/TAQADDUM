@@ -152,3 +152,16 @@ Stale September project attachment must not overwrite this branch state.
   Makefile invokes these Bash scripts with bash, preserving pipefail compatibility.
 - Local patch validation pending. No real database tests, migration, import,
   workbook rewrite or live credential rotation executed by this edit.
+
+## Compose credential cleanup — 2026-10-27
+
+- Owner's latest scan reports15 remaining findings, no scan errors.
+- Compose now requires POSTGRES_PASSWORD, MINIO_ROOT_PASSWORD and
+  DOCKER_DATABASE_URL. The latter must address PostgreSQL from Docker networking;
+  it is distinct from the host-side DATABASE_URL.
+- CI config-only validation supplies non-secret placeholders scoped to that step;
+  no service is started with them. Existing CI PostgreSQL service retains its secret.
+- Local configuration validation pending. Existing containers/accounts unchanged;
+  no restart, volume deletion, password rotation or import performed by this edit.
+- Before future local Compose commands, supply existing real credentials privately.
+  Changing environment values alone does not rotate an initialized PostgreSQL DB.

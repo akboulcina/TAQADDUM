@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: taqaddum
       POSTGRES_USER: taqaddum
-      POSTGRES_PASSWORD: taqaddum_local_only
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     ports: ['5432:5432']
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U taqaddum -d taqaddum']
@@ -13,14 +13,14 @@ services:
     command: server /data --console-address ':9001'
     environment:
       MINIO_ROOT_USER: minio_local
-      MINIO_ROOT_PASSWORD: minio_local_password_only
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD is required}
     ports: ['9000:9000', '9001:9001']
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     environment:
-      DATABASE_URL: postgresql://taqaddum:taqaddum_local_only@postgres:5432/taqaddum
+      DATABASE_URL: ${DOCKER_DATABASE_URL:?DOCKER_DATABASE_URL is required}
       NODE_ENV: local
       PGSSLMODE: 'disable'
       APP_VERSION: 0.1.0

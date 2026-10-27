@@ -66,5 +66,10 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test -- --reporter=verbose
       - run: pnpm boundaries
-      - run: docker compose config --quiet
+      - name: Validate Compose configuration only
+        env:
+          POSTGRES_PASSWORD: ${{ format('config-only-postgres-{0}', github.run_id) }}
+          MINIO_ROOT_PASSWORD: ${{ format('config-only-minio-{0}', github.run_id) }}
+          DOCKER_DATABASE_URL: postgresql://postgres:5432/taqaddum
+        run: docker compose config --quiet
       - run: pnpm build
