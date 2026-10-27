@@ -38,15 +38,15 @@ export function validateFacts(input: unknown): Facts {
     if (raw[key] !== undefined && typeof raw[key] !== 'boolean')
       throw new Error(`Booléen requis: ${key}`);
   if (
-    typeof raw.performedValue === 'number' &&
-    typeof raw.totalEstimatedCost === 'number' &&
-    raw.performedValue > raw.totalEstimatedCost
+    typeof raw['performedValue'] === 'number' &&
+    typeof raw['totalEstimatedCost'] === 'number' &&
+    raw['performedValue'] > raw['totalEstimatedCost']
   )
     throw new Error('Travaux réalisés supérieurs au coût total estimé');
   if (
-    typeof raw.releasedArea === 'number' &&
-    typeof raw.requiredArea === 'number' &&
-    raw.releasedArea > raw.requiredArea
+    typeof raw['releasedArea'] === 'number' &&
+    typeof raw['requiredArea'] === 'number' &&
+    raw['releasedArea'] > raw['requiredArea']
   )
     throw new Error('Emprise libérée supérieure à l’emprise requise');
   return { ...raw } as Facts;
