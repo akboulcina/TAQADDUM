@@ -124,3 +124,13 @@ Stale September project attachment must not overwrite this branch state.
   curl --max-time; no TypeScript in Bash; standalone heredoc terminators.
 - Connector edits GitHub, not executes Codespace. Separate owner report, source,
   synthetic tests, commit, applied migration and observed CI.
+
+## Owner checkpoint — 2026-10-27 11:32 +01
+
+- Owner screenshot confirms general PR checks succeeded, including bootstrap,
+  audit DB tests, format, lint, typecheck, tests, boundaries, Compose config and build.
+- Credential checks still fail. Owner's current scan reports 25 findings across
+  8 files, no scan errors; unsupported paths include .prettierignore and .gitkeep.
+- Importer connection fallback removed locally: DATABASE_URL is now mandatory.
+  Patch verification and publication pending. No import executed, database account
+  changed, workbook rewritten or live password rotated by this operation.

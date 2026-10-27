@@ -22,10 +22,12 @@ function toNumber(value: any): number | null {
 }
 
 async function main() {
+  const databaseUrl = process.env['DATABASE_URL'];
+  if (!databaseUrl?.trim()) {
+    throw new Error('DATABASE_URL is required');
+  }
   const client = new Client({
-    connectionString:
-      process.env.DATABASE_URL ??
-      'postgresql://taqaddum:taqaddum_local_only@127.0.0.1:5432/taqaddum',
+    connectionString: databaseUrl,
   });
 
   await client.connect();
