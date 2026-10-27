@@ -86,5 +86,30 @@ class ScannerTests(unittest.TestCase):
             self.assertNotIn('fixture', str(report))
 
 
+
+class StdinAssignmentTests(unittest.TestCase):
+    def assignment(self, expression):
+        key = "pass" + "word"
+        return "const " + key + " = " + expression + ";"
+
+    def test_exact_stdin_expression(self):
+        expression = r"readFileSync(0, 'utf8').replace(/\r?\n$/, '')"
+        self.assertEqual(findings_text(self.assignment(expression)), [])
+
+    def test_literal_still_detected(self):
+        report = findings_text(self.assignment("'synthetic-fixture'"))
+        self.assertTrue(report)
+        self.assertEqual(report[0]["kind"], "literal-sensitive-assignment")
+
+    def test_other_file_read_not_exempt(self):
+        expression = "readFileSync('fixture.txt', 'utf8')"
+        self.assertTrue(findings_text(self.assignment(expression)))
+
+    def test_stdin_with_literal_suffix_not_exempt(self):
+        expression = r"readFileSync(0, 'utf8').replace(/\r?\n$/, '')"
+        expression += " + 'synthetic-fixture'"
+        self.assertTrue(findings_text(self.assignment(expression)))
+
+
 if __name__ == '__main__':
     unittest.main()

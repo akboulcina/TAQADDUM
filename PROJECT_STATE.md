@@ -165,3 +165,37 @@ Stale September project attachment must not overwrite this branch state.
   no restart, volume deletion, password rotation or import performed by this edit.
 - Before future local Compose commands, supply existing real credentials privately.
   Changing environment values alone does not rotate an initialized PostgreSQL DB.
+
+## User credential separation — 2026-10-27
+
+- Owner pushed Compose cleanup f18fa77 after config-only validation and three
+  missing-variable checks. Latest owner scan:12 findings, no scan errors.
+- Workbook diagnostic: Users C2:C7 inline strings, no formulas/shared strings.
+- Local cleanup clears those cells; verifies all other cells in that sheet unchanged,
+  preserves other ZIP payloads and checks removed values are not retained in payloads.
+- Migration and importer no longer use published/shared passwords. New user rows
+  get independent random hashes and is_active=false. Existing migration conflicts
+  do nothing; importer conflicts update full_name only, preserving hash/active state.
+- Optional apps/api/scripts/activate-inactive-user.mjs requires explicit email,
+  --activate-inactive, DATABASE_URL and password via stdin. Updates only an inactive
+  public.users account, never role memberships. Not a production identity solution.
+- Patch validation pending. No import, migration, account activation or live rotation
+  executed. Existing exposed credentials remain valid until separately rotated.
+- Historical Git secrets are NOT erased by this cleanup; history audit and coordinated
+  rotations remain pending. Do not blindly replay modified legacy migrations.
+
+## Scanner stdin false-positive fix — 2026-10-27
+
+- After staging the activation tool, scanner flagged its stdin-derived assignment.
+- Narrow recognition added for the exact readFileSync(0, 'utf8').replace expression;
+  no file/path exclusion and no general readFileSync exemption.
+- Four regression cases added: exact stdin read accepted; literal assignment,
+  other file read and stdin plus literal suffix still reported.
+- Local verification pending; scanner remains a heuristic, not a safety guarantee.
+
+## Activation input validation correction — 2026-10-27
+
+- Owner diagnostic confirmed doubled backslashes in three generated JS regexes.
+- Corrected email whitespace validation, terminal newline removal and rejection
+  of embedded CR/LF/NUL. Scanner exception remains narrow and unchanged.
+- Behavioral verification pending. Activation tool not executed against a database.

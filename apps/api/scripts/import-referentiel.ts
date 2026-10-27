@@ -49,12 +49,12 @@ async function main() {
     if (role.rowCount === 0) continue;
 
     const user = await client.query(
-      `INSERT INTO users (email, full_name, password_hash)
-       VALUES ($1, $2, crypt($3, gen_salt('bf')))
+      `INSERT INTO users (email, full_name, password_hash, is_active)
+       VALUES ($1, $2, crypt(encode(gen_random_bytes(32), 'hex'), gen_salt('bf')), false)
        ON CONFLICT (email) DO UPDATE SET
          full_name = EXCLUDED.full_name
        RETURNING id`,
-      [u.email, u.full_name, u.password],
+      [u.email, u.full_name],
     );
 
     await client.query(

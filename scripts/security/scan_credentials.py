@@ -31,7 +31,8 @@ def findings_text(text):
         if match:
             value = match.group(1).strip().rstrip(",;").strip()
             literal = value.strip("\"'")
-            if literal and not any(marker in value for marker in ("${", "process.env", "os.environ", "getenv(", "secrets.", "vars.")) and not value.startswith(("String(", "body.", "input.", "env[", "event.", "e.", "random", "generate")) and literal not in ("null", "undefined", "None", "false", "true"):
+            stdin_read = value == r"readFileSync(0, 'utf8').replace(/\r?\n$/, '')"
+            if literal and not stdin_read and not any(marker in value for marker in ("${", "process.env", "os.environ", "getenv(", "secrets.", "vars.")) and not value.startswith(("String(", "body.", "input.", "env[", "event.", "e.", "random", "generate")) and literal not in ("null", "undefined", "None", "false", "true"):
                 found.append({"location": str(number), "kind": "literal-sensitive-assignment"})
     return found
 

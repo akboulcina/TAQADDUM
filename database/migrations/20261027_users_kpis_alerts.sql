@@ -99,13 +99,13 @@ INSERT INTO roles (code, name, data_scope) VALUES
   ('FINANCE', 'Contrôleur budgétaire', 'financial_data')
 ON CONFLICT (code) DO NOTHING;
 
-INSERT INTO users (email, full_name, password_hash) VALUES
-  ('direction@taqaddum.dz', 'Direction CNED', crypt('Taqaddum2026!', gen_salt('bf'))),
-  ('pmo@taqaddum.dz', 'CNED / PMO', crypt('Taqaddum2026!', gen_salt('bf'))),
-  ('mo@taqaddum.dz', 'Maître d''ouvrage', crypt('Taqaddum2026!', gen_salt('bf'))),
-  ('bet@taqaddum.dz', 'Bureau d''études', crypt('Taqaddum2026!', gen_salt('bf'))),
-  ('entreprise@taqaddum.dz', 'Contractant', crypt('Taqaddum2026!', gen_salt('bf'))),
-  ('finance@taqaddum.dz', 'Contrôleur budgétaire', crypt('Taqaddum2026!', gen_salt('bf')))
+INSERT INTO users (email, full_name, password_hash, is_active) VALUES
+  ('direction@taqaddum.dz', 'Direction CNED', crypt(encode(gen_random_bytes(32), 'hex'), gen_salt('bf')), false),
+  ('pmo@taqaddum.dz', 'CNED / PMO', crypt(encode(gen_random_bytes(32), 'hex'), gen_salt('bf')), false),
+  ('mo@taqaddum.dz', 'Maître d''ouvrage', crypt(encode(gen_random_bytes(32), 'hex'), gen_salt('bf')), false),
+  ('bet@taqaddum.dz', 'Bureau d''études', crypt(encode(gen_random_bytes(32), 'hex'), gen_salt('bf')), false),
+  ('entreprise@taqaddum.dz', 'Contractant', crypt(encode(gen_random_bytes(32), 'hex'), gen_salt('bf')), false),
+  ('finance@taqaddum.dz', 'Contrôleur budgétaire', crypt(encode(gen_random_bytes(32), 'hex'), gen_salt('bf')), false)
 ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
