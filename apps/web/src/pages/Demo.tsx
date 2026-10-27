@@ -1,0 +1,630 @@
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { AlertBanner, Button, StatusBadge, Text } from '@taqaddum/ui';
+import { useTranslation, type Locale } from '@taqaddum/i18n-ui';
+import { MonitoringPanel, demoContext } from './MonitoringPanel';
+import '@taqaddum/design-tokens/tokens.css';
+import './demo.css';
+import './monitoring-integration.css';
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
+type User = { id: string; email: string; fullName: string; roleCode: string; roleName: string };
+type Project = {
+  id: string;
+  code: string;
+  name: string;
+  organization: string;
+  status: string;
+  updatedAt: string;
+};
+type Kpi = {
+  id: string;
+  kpi_id: string;
+  name: string;
+  family: string;
+  phase: string;
+  unit: string;
+  owner_role: string;
+};
+type Rule = {
+  id: string;
+  rule_id: string;
+  name: string;
+  level: string;
+  readable_condition: string;
+  recipients: string;
+  frequency: string;
+};
+const navigation = [
+  ['overview', 'Vue d’ensemble', 'Disponible'],
+  ['portfolios', 'Portefeuilles', 'Démo'],
+  ['projects', 'Projets', 'Disponible'],
+  ['monitoring', 'Suivi opérationnel', 'Pilote'],
+  ['kpis', 'Référentiel KPI', 'Disponible'],
+  ['alerts', 'Règles d’alerte', 'Disponible'],
+  ['contracts', 'Contrats et marchés', 'À venir'],
+  ['finance', 'Finance', 'À venir'],
+  ['field', 'Terrain et GIS', 'Démo'],
+  ['control', 'Centre de contrôle', 'Pilote'],
+  ['decisions', 'Décisions et actions', 'À venir'],
+  ['reports', 'Rapports', 'Démo'],
+  ['admin', 'Administration', 'À venir'],
+] as const;
+const statusName: Record<string, string> = {
+  draft: 'Brouillon',
+  authorized: 'Autorisé',
+  archived: 'Archivé',
+};
+export function Demo() {
+  const { locale, setLocale, t, direction } = useTranslation('fr');
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState('');
+  const [email, setEmail] = useState('direction@taqaddum.dz');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [apiReady, setApiReady] = useState<boolean | null>(null);
+  const [lastChecked, setLastChecked] = useState(new Date());
+  const [activeSection, setActiveSection] = useState('overview');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [kpis, setKpis] = useState<Kpi[]>([]);
+  const [rules, setRules] = useState<Rule[]>([]);
+  const [query, setQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [isCreateOpen, setCreateOpen] = useState(false);
+  const [newCode, setNewCode] = useState('');
+  const [newName, setNewName] = useState('');
+  useEffect(() => {
+    let active = true;
+    async function check() {
+      try {
+        const r = await fetch(`${apiBaseUrl}/health/ready`);
+        if (active) setApiReady(r.ok);
+      } catch {
+        if (active) setApiReady(false);
+      } finally {
+        if (active) setLastChecked(new Date());
+      }
+    }
+    void check();
+    const timer = setInterval(() => void check(), 30000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, []);
+  async function api(path: string, auth: string, init: RequestInit = {}) {
+    const r = await fetch(`${apiBaseUrl}${path}`, {
+      ...init,
+      headers: {
+        ...demoContext,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth}`,
+      },
+    });
+    const payload = await r.json();
+    if (!r.ok) throw new Error(payload.detail ?? `Erreur HTTP ${r.status}`);
+    return payload;
+  }
+  async function load(auth: string) {
+    const [p, k, a] = await Promise.all([
+      api('/v1/projects', auth),
+      api('/v1/kpis', auth),
+      api('/v1/alert-rules', auth),
+    ]);
+    setProjects(
+      (p.items ?? p.data ?? []).map((v: any) => ({
+        id: v.id,
+        code: v.code ?? v.projectCode,
+        name: v.name ?? v.nameFr,
+        organization: v.organization ?? 'Organisation Démo',
+        status: v.status,
+        updatedAt: v.updatedAt ?? v.updated_at,
+      })),
+    );
+    setKpis(k.items ?? []);
+    setRules((a.items ?? []).filter((v: Rule) => /^AL(0[1-9]|1[0-7])$/.test(v.rule_id)));
+  }
+  async function signIn(e: FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError('');
+    try {
+      const p = await api('/v1/auth/login', '', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+      setUser(p.user);
+      setToken(p.token);
+      setPassword('');
+      setActiveSection('overview');
+      setNotice(`Connexion réussie : ${p.user.fullName}.`);
+      try {
+        await load(p.token);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Chargement impossible');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Connexion impossible');
+    } finally {
+      setBusy(false);
+    }
+  }
+  function signOut() {
+    setUser(null);
+    setToken('');
+    setProjects([]);
+    setKpis([]);
+    setRules([]);
+    setNotice('');
+    setError('');
+    setCreateOpen(false);
+  }
+  async function createProject(e: FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError('');
+    try {
+      await api('/v1/projects', token, {
+        method: 'POST',
+        body: JSON.stringify({
+          code: newCode.trim(),
+          name: newName.trim(),
+          nameFr: newName.trim(),
+          nameAr: newName.trim(),
+          nameEn: newName.trim(),
+        }),
+      });
+      setCreateOpen(false);
+      setNewCode('');
+      setNewName('');
+      setNotice('Projet enregistré. Les affectations MO/PMO sont à configurer séparément.');
+      await load(token);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Création impossible');
+    } finally {
+      setBusy(false);
+    }
+  }
+  const filteredProjects = useMemo(
+    () =>
+      projects.filter(
+        (p) =>
+          `${p.code} ${p.name} ${p.organization}`.toLowerCase().includes(query.toLowerCase()) &&
+          (statusFilter === 'all' || p.status === statusFilter),
+      ),
+    [projects, query, statusFilter],
+  );
+  const current = navigation.find((v) => v[0] === activeSection);
+  if (!user)
+    return (
+      <div className="app-shell" dir={direction}>
+        <main className="content" style={{ maxWidth: 520, margin: '70px auto' }}>
+          <section className="panel">
+            <div className="panel__header">
+              <div>
+                <span className="eyebrow">TAQADDUM</span>
+                <Text as="h1" variant="title">
+                  Connexion
+                </Text>
+              </div>
+            </div>
+            {error && <AlertBanner tone="warning">{error}</AlertBanner>}
+            <form className="form-grid" onSubmit={signIn}>
+              <label>
+                E-mail
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
+              <label>
+                Mot de passe
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </label>
+              <Button type="submit" disabled={busy}>
+                {busy ? 'Connexion…' : 'Se connecter'}
+              </Button>
+            </form>
+            <p className="muted">
+              Démo privée · Comptes MO, PMO, Direction, BET, Entreprise et Finance.
+            </p>
+          </section>
+        </main>
+      </div>
+    );
+  const projectTable = (
+    <article className="panel panel--wide">
+      <div className="panel__header">
+        <div>
+          <span className="eyebrow">Portefeuille</span>
+          <Text as="h2" variant="heading">
+            Projets
+          </Text>
+        </div>
+        <Button onClick={() => setCreateOpen(true)}>Créer un projet</Button>
+      </div>
+      <div className="table-toolbar">
+        <label>
+          Rechercher
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Code, nom ou organisation"
+          />
+        </label>
+        <label>
+          Statut
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">Tous</option>
+            <option value="draft">Brouillon</option>
+            <option value="authorized">Autorisé</option>
+            <option value="archived">Archivé</option>
+          </select>
+        </label>
+      </div>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Nom</th>
+              <th>Statut</th>
+              <th>Organisation</th>
+              <th>Modification</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProjects.map((p) => (
+              <tr key={p.id}>
+                <td>
+                  <span className="code">{p.code}</span>
+                </td>
+                <td>{p.name}</td>
+                <td>
+                  <StatusBadge
+                    tone={
+                      p.status === 'authorized'
+                        ? 'success'
+                        : p.status === 'draft'
+                          ? 'warning'
+                          : 'neutral'
+                    }
+                  >
+                    {statusName[p.status] ?? p.status}
+                  </StatusBadge>
+                </td>
+                <td>{p.organization}</td>
+                <td>{p.updatedAt ? new Date(p.updatedAt).toLocaleString() : '—'}</td>
+                <td>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setActiveSection('monitoring')}
+                  >
+                    Ouvrir le suivi
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!filteredProjects.length && <p className="muted">Aucun projet correspondant.</p>}
+      </div>
+      <p className="muted">
+        Le suivi opérationnel vérifie les affectations côté serveur. L’ancienne API de
+        liste/création reste réservée à la démo privée.
+      </p>
+    </article>
+  );
+  return (
+    <div className="app-shell" dir={direction}>
+      <header className="topbar">
+        <div className="brand">
+          <span className="brand__mark">T</span>
+          <Text as="span" variant="title">
+            {t('app_name')}
+          </Text>
+        </div>
+        <div className="topbar__context">
+          <span className="context-chip">{user.roleName}</span>
+          <span className="context-chip">Local · Démo</span>
+          <StatusBadge tone={apiReady ? 'success' : 'warning'}>
+            {apiReady === null
+              ? 'Vérification API…'
+              : apiReady
+                ? 'API connectée'
+                : 'API indisponible'}
+          </StatusBadge>
+          <span className="topbar__meta">Vérifiée à {lastChecked.toLocaleTimeString()}</span>
+          <Button size="sm" variant="secondary" onClick={signOut}>
+            Déconnexion
+          </Button>
+          <nav className="locale-switcher" aria-label="Langue">
+            {(['fr', 'ar', 'en'] as Locale[]).map((l) => (
+              <Button
+                key={l}
+                size="sm"
+                variant={locale === l ? 'primary' : 'secondary'}
+                aria-pressed={locale === l}
+                onClick={() => setLocale(l)}
+              >
+                {l.toUpperCase()}
+              </Button>
+            ))}
+          </nav>
+        </div>
+      </header>
+      <div className="shell-body">
+        <aside className="sidebar" aria-label="Navigation principale">
+          <div className="sidebar__heading">Modules</div>
+          <nav className="sidebar__nav">
+            {navigation.map(([id, label, state]) => (
+              <button
+                key={id}
+                type="button"
+                className={`nav-item ${activeSection === id ? 'nav-item--active' : ''}`}
+                onClick={() => setActiveSection(id)}
+              >
+                <span>{label}</span>
+                <small>{state}</small>
+              </button>
+            ))}
+          </nav>
+          <div className="demo-note">
+            <StatusBadge tone="info">Mode démonstration</StatusBadge>
+            <p>Connecté : {user.email}</p>
+            <p>Les modules marqués Démo ou À venir ne sont pas présentés comme raccordés.</p>
+          </div>
+        </aside>
+        <main className="content">
+          {error && <AlertBanner tone="warning">{error}</AlertBanner>}
+          {notice && (
+            <AlertBanner
+              tone="success"
+              dismissible
+              dismissLabel="Fermer"
+              onDismiss={() => setNotice('')}
+            >
+              {notice}
+            </AlertBanner>
+          )}
+          <section className="page-heading">
+            <div>
+              <span className="eyebrow">TAQADDUM · Pilotage des projets</span>
+              <Text as="h1" variant="title">
+                {current?.[1] ?? 'Vue d’ensemble'}
+              </Text>
+              <p>
+                Projets, suivi opérationnel, indicateurs et alertes dans votre espace de pilotage.
+              </p>
+            </div>
+            <div className="heading-actions">
+              <span className="scope-label">Organisation Démo</span>
+              <Button
+                variant="secondary"
+                disabled={busy}
+                onClick={() => void load(token).catch((e) => setError(e.message))}
+              >
+                Actualiser les référentiels
+              </Button>
+            </div>
+          </section>
+          {activeSection === 'overview' && (
+            <>
+              <section className="metric-grid" aria-label="Résumé">
+                <article className="metric-card">
+                  <span>Projets</span>
+                  <strong>{projects.length}</strong>
+                  <small>dans le contexte démo</small>
+                </article>
+                <article className="metric-card">
+                  <span>Projets autorisés</span>
+                  <strong>{projects.filter((p) => p.status === 'authorized').length}</strong>
+                  <small>statut administratif, pas avancement</small>
+                </article>
+                <article className="metric-card">
+                  <span>KPI référentiel</span>
+                  <strong>{kpis.length}</strong>
+                  <small>5 calculs raccordés au pilote</small>
+                </article>
+                <article className="metric-card">
+                  <span>Règles d’alerte</span>
+                  <strong>{rules.length}</strong>
+                  <small>définitions, pas incidents déclenchés</small>
+                </article>
+              </section>
+              <section className="content-grid">
+                {projectTable}
+                <article className="panel">
+                  <div className="panel__header">
+                    <Text as="h2" variant="heading">
+                      Suivi KPI et alertes
+                    </Text>
+                    <StatusBadge tone="info">Pilote</StatusBadge>
+                  </div>
+                  <p>
+                    Le MO soumet une situation, la PMO la valide et la Direction consulte les
+                    résultats calculés.
+                  </p>
+                  <Button onClick={() => setActiveSection('monitoring')}>
+                    Accéder au suivi opérationnel
+                  </Button>
+                </article>
+                <article className="panel">
+                  <div className="panel__header">
+                    <Text as="h2" variant="heading">
+                      Terrain et GIS
+                    </Text>
+                    <StatusBadge tone="info">Démo</StatusBadge>
+                  </div>
+                  <p>
+                    Entrée de l’ancienne navigation conservée. Aucune carte raccordée n’a été
+                    retrouvée dans l’ancienne page restaurée.
+                  </p>
+                  <Button variant="secondary" onClick={() => setActiveSection('field')}>
+                    Ouvrir le module
+                  </Button>
+                </article>
+              </section>
+            </>
+          )}
+          {activeSection === 'projects' && (
+            <section className="content-grid">{projectTable}</section>
+          )}
+          {(activeSection === 'monitoring' || activeSection === 'control') && (
+            <div className="monitoring-module">
+              <MonitoringPanel key={user.id} token={token} user={user} />
+            </div>
+          )}
+          {activeSection === 'kpis' && (
+            <article className="panel">
+              <div className="panel__header">
+                <Text as="h2" variant="heading">
+                  Référentiel KPI
+                </Text>
+                <StatusBadge tone="info">{kpis.length} définitions</StatusBadge>
+              </div>
+              <p className="muted">
+                Les valeurs calculées sont dans Suivi opérationnel, après validation d’une
+                situation.
+              </p>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Code</th>
+                      <th>KPI</th>
+                      <th>Famille</th>
+                      <th>Phase</th>
+                      <th>Unité</th>
+                      <th>Responsable</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {kpis.map((k) => (
+                      <tr key={k.id}>
+                        <td className="code">{k.kpi_id}</td>
+                        <td>{k.name}</td>
+                        <td>{k.family}</td>
+                        <td>{k.phase}</td>
+                        <td>{k.unit}</td>
+                        <td>{k.owner_role}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          )}
+          {activeSection === 'alerts' && (
+            <article className="panel">
+              <div className="panel__header">
+                <Text as="h2" variant="heading">
+                  Règles d’alerte
+                </Text>
+                <StatusBadge tone="info">{rules.length} règles</StatusBadge>
+              </div>
+              <p className="muted">
+                AL02, AL06 et AL13 exécutées dans le pilote. Incidents réels visibles sur la
+                dernière situation validée. Notes hors AL01–AL17 masquées sans suppression.
+              </p>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Code</th>
+                      <th>Alerte</th>
+                      <th>Niveau</th>
+                      <th>Condition</th>
+                      <th>Destinataires</th>
+                      <th>Fréquence</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rules.map((r) => (
+                      <tr key={r.id}>
+                        <td className="code">{r.rule_id}</td>
+                        <td>{r.name}</td>
+                        <td>{r.level}</td>
+                        <td>{r.readable_condition}</td>
+                        <td>{r.recipients}</td>
+                        <td>{r.frequency}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          )}
+          {!['overview', 'projects', 'monitoring', 'control', 'kpis', 'alerts'].includes(
+            activeSection,
+          ) && (
+            <article className="panel">
+              <div className="panel__header">
+                <Text as="h2" variant="heading">
+                  {current?.[1]}
+                </Text>
+                <StatusBadge tone="info">{current?.[2] ?? 'À venir'}</StatusBadge>
+              </div>
+              <p>
+                Module de l’ancienne navigation conservé. Aucun écran métier fonctionnel
+                correspondant n’était raccordé dans la page historique examinée.
+              </p>
+              {activeSection === 'field' && (
+                <p>
+                  La navigation Terrain et GIS est rétablie ; une carte nécessite des couches et des
+                  données géographiques à raccorder. Aucune position de projet n’est inventée.
+                </p>
+              )}
+              <Button variant="secondary" onClick={() => setActiveSection('overview')}>
+                Retour au tableau de bord
+              </Button>
+            </article>
+          )}
+        </main>
+      </div>
+      {isCreateOpen && (
+        <div className="modal-backdrop" role="presentation">
+          <section className="modal" role="dialog" aria-modal="true" aria-labelledby="create-title">
+            <div className="modal__header">
+              <Text as="h2" variant="heading" id="create-title">
+                Créer un projet
+              </Text>
+              <Button size="sm" variant="secondary" onClick={() => setCreateOpen(false)}>
+                Fermer
+              </Button>
+            </div>
+            <form className="form-grid" onSubmit={createProject}>
+              <label>
+                Code
+                <input required value={newCode} onChange={(e) => setNewCode(e.target.value)} />
+              </label>
+              <label>
+                Nom
+                <input required value={newName} onChange={(e) => setNewName(e.target.value)} />
+              </label>
+              <p className="muted">Organisation : Organisation Démo</p>
+              <div className="modal__actions">
+                <Button type="button" variant="secondary" onClick={() => setCreateOpen(false)}>
+                  Annuler
+                </Button>
+                <Button type="submit" disabled={busy}>
+                  Créer
+                </Button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}
