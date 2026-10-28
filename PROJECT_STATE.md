@@ -80,6 +80,7 @@ Stale September project attachment must not overwrite this branch state.
   row-lock transaction, repeat409, immutable dated/versioned snapshots/evidence.
 - Pilot AV1 AV2 DL1 DL2 QR1 and AL02 AL06 AL13; missing unknown not0/false, tri-state
   and noncalculable. Hardcoded provisional thresholds regression oracle until DB parity.
+  Freshness31days technical not official CNED cadence; DO1-DO3/AL16 confidence gate pending.
 - Direction AV2/DL2/QR1 and3 alert types, no raw source. MO/PMO memberships and
   hardcoded roles baseline pending configurable matrix. Optional exact0052 demo
   membership script preserves conflicts and separates MO/PMO.
@@ -132,7 +133,7 @@ Stale September project attachment must not overwrite this branch state.
   scoped reports. Synthetic datasets labelled.
 - Preserve two delays/uncapped consumption, adjusted/current/delegated AE,
   consolidated works including terminated/parachevement, separate advances; active
-  neither completed nor received. Authorized administrative count not active count.
+  neither completed nor_received. Authorized administrative count not active count.
   CO1/CO6 weights flagged off; wilaya/licence/geo await owner. No eval workbook prose;
   typed missing-aware conditions. H6 brief truncated.
 
@@ -200,7 +201,7 @@ Stale September project attachment must not overwrite this branch state.
 - Optional apps/api/scripts/activate-inactive-user.mjs requires explicit email,
   --activate-inactive, DATABASE_URL and password via stdin. Updates only an inactive
   public.users account, never role memberships. Not a production identity solution.
-- Patch validation pending. No import, migration, account activation or live_rotation
+- Patch validation pending. No import, migration, account activation or live rotation
   executed. Existing exposed credentials remain valid until separately rotated.
 - Historical Git secrets are NOT erased by this cleanup; history audit and coordinated
   rotations remain pending. Do not blindly replay modified legacy migrations.
