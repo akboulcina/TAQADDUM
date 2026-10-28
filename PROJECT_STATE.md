@@ -155,7 +155,7 @@ Stale September project attachment must not overwrite this branch state.
   8 files, no scan errors; unsupported paths include .prettierignore and .gitkeep.
 - Importer connection fallback removed locally: DATABASE_URL is now mandatory.
   Patch verification and publication pending. No import executed, database account
-  changed, workbook rewritten or live password rotated by this operation.
+  changed, workbook rewritten or live password_rotated by this operation.
 
 ## Makefile credential cleanup — 2026-10-27
 
@@ -197,7 +197,7 @@ Stale September project attachment must not overwrite this branch state.
   preserves other ZIP payloads and checks removed values are not retained in payloads.
 - Migration and importer no longer use published/shared passwords. New user rows
   get independent random hashes and is_active=false. Existing migration conflicts
-  do nothing; importer conflicts update_full_name only, preserving hash/active state.
+  do nothing; importer conflicts update full_name only, preserving hash/active state.
 - Optional apps/api/scripts/activate-inactive-user.mjs requires explicit email,
   --activate-inactive, DATABASE_URL and password via stdin. Updates only an inactive
   public.users account, never role memberships. Not a production identity solution.
@@ -264,3 +264,15 @@ Stale September project attachment must not overwrite this branch state.
 - No SQL applied, existing record modified, real access granted, application
   restarted, PR merged or deployment performed. Remaining work: dedicated DB
   tests, login integration, supplied PMO frontend integration and browser checks.
+
+## PMO migration ordering correction — 2026-10-28
+
+- The unexecuted draft `20261028_pmo_authentication.sql` sorted before its
+  prerequisite `20261028_security_identity_links.sql`. It is now a comment-only
+  marker; the identical function SQL is in `20261028_workspace_authentication.sql`.
+  Existing security/legacy migrations and the CI workflow are unchanged.
+- Restored the historical phrase `update full_name`; no importer code changed.
+- Static checks verified dependency filename order, exactly one function definition,
+  unchanged SQL payload, comment-only marker and a targeted state-document diff.
+  PostgreSQL bootstrap, Vitest, formatting and full CI remain unverified here.
+- No database migration was executed. Login/UI remain unchanged at this checkpoint.
