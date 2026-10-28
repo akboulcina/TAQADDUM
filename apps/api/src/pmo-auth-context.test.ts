@@ -5,16 +5,27 @@ import { authenticateWorkspace, parseWorkspaceContexts } from './pmo-auth-contex
 import { hashSessionToken, type SecurityDb } from './security-auth.js';
 
 const context = () => ({
-  tenantId: randomUUID(), tenantCode: 'test', tenantName: 'Test tenant',
-  organizationId: randomUUID(), organizationCode: 'test', organizationName: 'Test organization',
-  roleCode: 'MO', roleName: 'Test role', permissions: ['projects.read'],
+  tenantId: randomUUID(),
+  tenantCode: 'test',
+  tenantName: 'Test tenant',
+  organizationId: randomUUID(),
+  organizationCode: 'test',
+  organizationName: 'Test organization',
+  roleCode: 'MO',
+  roleName: 'Test role',
+  permissions: ['projects.read'],
 });
 const account = () => ({
-  public_user_id: randomUUID(), identity_user_id: randomUUID(),
-  email: 'workspace@example.test', full_name: 'Synthetic test identity', contexts: [context()],
+  public_user_id: randomUUID(),
+  identity_user_id: randomUUID(),
+  email: 'workspace@example.test',
+  full_name: 'Synthetic test identity',
+  contexts: [context()],
 });
 const dbFor = (rows: Record<string, unknown>[]): SecurityDb => ({
-  async query() { return { rows }; },
+  async query() {
+    return { rows };
+  },
 });
 
 describe('PMO workspace authentication contract', () => {
@@ -38,7 +49,10 @@ describe('PMO workspace authentication contract', () => {
     assert.deepEqual(parsed[1]!.permissions, ['projects.create']);
   });
   it('allows memberships with no business permission without inventing rights', () => {
-    assert.deepEqual(parseWorkspaceContexts([{ ...context(), permissions: [] }])![0]!.permissions, []);
+    assert.deepEqual(
+      parseWorkspaceContexts([{ ...context(), permissions: [] }])![0]!.permissions,
+      [],
+    );
   });
   it('preserves explicitly distinct canonical and public user IDs', async () => {
     const row = account();
@@ -64,17 +78,31 @@ describe('PMO workspace authentication contract', () => {
   });
   it('rejects absent and ambiguous authentication results', async () => {
     const row = account();
-    assert.equal(await authenticateWorkspace(dbFor([]), row.email, randomUUID(), randomUUID()), undefined);
-    assert.equal(await authenticateWorkspace(dbFor([row, row]), row.email, randomUUID(), randomUUID()), undefined);
+    assert.equal(
+      await authenticateWorkspace(dbFor([]), row.email, randomUUID(), randomUUID()),
+      undefined,
+    );
+    assert.equal(
+      await authenticateWorkspace(dbFor([row, row]), row.email, randomUUID(), randomUUID()),
+      undefined,
+    );
   });
   it('rejects malformed account identities and scope payloads', async () => {
     const row = account();
     for (const broken of [{ ...row, identity_user_id: '' }, { ...row, contexts: [] }])
-      assert.equal(await authenticateWorkspace(dbFor([broken]), row.email, randomUUID(), randomUUID()), undefined);
+      assert.equal(
+        await authenticateWorkspace(dbFor([broken]), row.email, randomUUID(), randomUUID()),
+        undefined,
+      );
   });
   it('does not query the database with empty login inputs', async () => {
     let calls = 0;
-    const db: SecurityDb = { async query() { calls += 1; return { rows: [] }; } };
+    const db: SecurityDb = {
+      async query() {
+        calls += 1;
+        return { rows: [] };
+      },
+    };
     await authenticateWorkspace(db, '', randomUUID(), randomUUID());
     await authenticateWorkspace(db, 'workspace@example.test', '', randomUUID());
     await authenticateWorkspace(db, 'workspace@example.test', randomUUID(), '');

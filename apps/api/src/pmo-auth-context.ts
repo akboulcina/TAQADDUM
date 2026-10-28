@@ -16,8 +16,14 @@ export type WorkspaceAccount = SessionActor & { contexts: WorkspaceContext[] };
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const textFields = [
-  'tenantId', 'tenantCode', 'tenantName', 'organizationId',
-  'organizationCode', 'organizationName', 'roleCode', 'roleName',
+  'tenantId',
+  'tenantCode',
+  'tenantName',
+  'organizationId',
+  'organizationCode',
+  'organizationName',
+  'roleCode',
+  'roleName',
 ] as const;
 
 export function parseWorkspaceContexts(input: unknown): WorkspaceContext[] | undefined {
@@ -56,22 +62,27 @@ export function parseWorkspaceContexts(input: unknown): WorkspaceContext[] | und
 export async function authenticateWorkspace(
   db: SecurityDb,
   email: string,
-  password: string,
+  credentialInput: string,
   token: string,
 ): Promise<WorkspaceAccount | undefined> {
-  if (!email.trim() || !password || !token) return undefined;
+  if (!email.trim() || !credentialInput || !token) return undefined;
   const result = await db.query(
     `SELECT public_user_id,identity_user_id,email,full_name,contexts
      FROM identity.authenticate_workspace_user($1,$2,$3)`,
-    [email.trim().toLowerCase(), password, hashSessionToken(token)],
+    [email.trim().toLowerCase(), credentialInput, hashSessionToken(token)],
   );
   if (result.rows.length !== 1) return undefined;
   const row = result.rows[0]!;
   const contexts = parseWorkspaceContexts(row['contexts']);
-  if (!contexts || typeof row['public_user_id'] !== 'string'
-      || typeof row['identity_user_id'] !== 'string'
-      || !uuid.test(row['public_user_id']) || !uuid.test(row['identity_user_id'])
-      || typeof row['email'] !== 'string' || typeof row['full_name'] !== 'string')
+  if (
+    !contexts ||
+    typeof row['public_user_id'] !== 'string' ||
+    typeof row['identity_user_id'] !== 'string' ||
+    !uuid.test(row['public_user_id']) ||
+    !uuid.test(row['identity_user_id']) ||
+    typeof row['email'] !== 'string' ||
+    typeof row['full_name'] !== 'string'
+  )
     return undefined;
   return {
     userId: row['public_user_id'],

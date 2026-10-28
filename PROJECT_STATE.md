@@ -80,7 +80,6 @@ Stale September project attachment must not overwrite this branch state.
   row-lock transaction, repeat409, immutable dated/versioned snapshots/evidence.
 - Pilot AV1 AV2 DL1 DL2 QR1 and AL02 AL06 AL13; missing unknown not0/false, tri-state
   and noncalculable. Hardcoded provisional thresholds regression oracle until DB parity.
-  Freshness31days technical not official CNED cadence; DO1-DO3/AL16 confidence gate pending.
 - Direction AV2/DL2/QR1 and3 alert types, no raw source. MO/PMO memberships and
   hardcoded roles baseline pending configurable matrix. Optional exact0052 demo
   membership script preserves conflicts and separates MO/PMO.
@@ -155,7 +154,7 @@ Stale September project attachment must not overwrite this branch state.
   8 files, no scan errors; unsupported paths include .prettierignore and .gitkeep.
 - Importer connection fallback removed locally: DATABASE_URL is now mandatory.
   Patch verification and publication pending. No import executed, database account
-  changed, workbook rewritten or live password_rotated by this operation.
+  changed, workbook rewritten or live password rotated by this operation.
 
 ## Makefile credential cleanup — 2026-10-27
 
@@ -201,7 +200,7 @@ Stale September project attachment must not overwrite this branch state.
 - Optional apps/api/scripts/activate-inactive-user.mjs requires explicit email,
   --activate-inactive, DATABASE_URL and password via stdin. Updates only an inactive
   public.users account, never role memberships. Not a production identity solution.
-- Patch validation pending. No import, migration, account activation or live rotation
+- Patch validation pending. No import, migration, account activation or live_rotation
   executed. Existing exposed credentials remain valid until separately rotated.
 - Historical Git secrets are NOT erased by this cleanup; history audit and coordinated
   rotations remain pending. Do not blindly replay modified legacy migrations.
@@ -276,3 +275,26 @@ Stale September project attachment must not overwrite this branch state.
   unchanged SQL payload, comment-only marker and a targeted state-document diff.
   PostgreSQL bootstrap, Vitest, formatting and full CI remain unverified here.
 - No database migration was executed. Login/UI remain unchanged at this checkpoint.
+
+## PR 12 checkpoint verification — 2026-10-28
+
+- Observed GitHub checks for `4d428b17c419c537353f34d87f4ef4b937588f70`:
+  frozen install, dedicated CI PostgreSQL bootstrap and database audit tests passed.
+  The fresh CI bootstrap therefore exercised the corrected migration order.
+  This does not verify runtime authentication or least-privilege function behavior.
+- Both jobs finished with failure. The general job failed at `pnpm format:check`;
+  subsequent lint, typecheck, Vitest, boundaries, Compose validation and build were
+  skipped. The credential job's scanner tests passed, but its repository scan failed.
+- Reproduced a sensitive-assignment rule hit on the adapter's typed credential
+  parameter. Renamed it to `credentialInput`; the scanner and credential semantics
+  are unchanged. Reformatted the adapter/test candidates and restored the historical
+  phrase `password rotated`. Repository-wide scan and Prettier await rerun in CI.
+- Repeated ten unit cases successfully after TypeScript 5.8.2 transpilation using
+  Node v20.20.1 and the adapted built-in runner, not an actual Vitest execution.
+- Published `main.ts` still uses the prior login/session flow. The new contract is
+  not wired into login or protected routes. No migration or account provisioning
+  occurred on the application database. Live Codespace working-tree inspection is
+  unavailable here; no local files, excluded edits or caches were modified.
+- Continue on PR 12 and its existing branch only. First resolve checkpoint CI,
+  then verify the new SQL with dedicated-database HTTP tests before login/API
+  integration. No additional branch, workflow, deployment or real access is created.
