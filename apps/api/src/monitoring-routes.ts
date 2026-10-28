@@ -1,8 +1,47 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { Client } from 'pg';
 import { calculate, validateFacts } from './monitoring-engine.js';
+import { authorizeOrganization } from './security-auth.js';
 
-type Actor = { userId: string };
+type Actor = { userId: string; identityUserId: string };
+export function canIndependentlyValidate(
+  roleCodes: string[],
+  projectCanValidate: boolean,
+  validatorUserId: string,
+  submitterUserId: string,
+): boolean {
+  return (
+    roleCodes.includes('CNED_PMO') &&
+    !roleCodes.includes('CNED_DIRECTION') &&
+    projectCanValidate &&
+    validatorUserId !== submitterUserId
+  );
+}
+export async function listAssignedMonitoringProjects(
+  db: Pick<Client, 'query'>,
+  tenantId: string,
+  organizationId: string,
+  userId: string,
+) {
+  const result = await db.query(
+    `SELECT p.id,p.project_code AS code,p.name_fr AS name,COALESCE(m.can_submit,false) AS can_submit,COALESCE(m.can_validate,false) AS can_validate FROM project.projects p JOIN monitoring.project_members m ON m.project_id=p.id AND m.user_id=$3 WHERE p.tenant_id::text=$1 AND p.organization_id::text=$2 ORDER BY p.project_code`,
+    [tenantId, organizationId, userId],
+  );
+  return result.rows;
+}
+export async function getAssignedMonitoringProject(
+  db: Pick<Client, 'query'>,
+  projectId: string,
+  tenantId: string,
+  organizationId: string,
+  userId: string,
+) {
+  const result = await db.query(
+    `SELECT p.id,COALESCE(m.can_submit,false) AS can_submit,COALESCE(m.can_validate,false) AS can_validate FROM project.projects p JOIN monitoring.project_members m ON m.project_id=p.id AND m.user_id=$4 WHERE p.id=$1 AND p.tenant_id::text=$2 AND p.organization_id::text=$3`,
+    [projectId, tenantId, organizationId, userId],
+  );
+  return result.rows[0];
+}
 class HttpError extends Error {
   constructor(
     public status: number,
@@ -71,6 +110,14 @@ export async function monitoringRoute(
       statement_timeout: 10000,
     });
     await db.connect();
+    await db.query('BEGIN');
+    transaction = true;
+    await db.query(
+      `SELECT set_config('app.tenant_id',$1,true),set_config('app.organization_id',$2,true)`,
+      [tenant, organization],
+    );
+    if (!(await authorizeOrganization(db, actor.identityUserId, tenant, organization)))
+      throw new HttpError(403, 'Membership actif requis dans cette organisation');
     const roles = (
       await db.query(
         `SELECT r.code FROM public.users u JOIN public.user_roles ur ON ur.user_id=u.id JOIN public.roles r ON r.id=ur.role_id WHERE u.id=$1 AND u.is_active=true`,
@@ -84,12 +131,9 @@ export async function monitoringRoute(
     if (!director && !mo && !pmo)
       throw new HttpError(403, 'Ce pilote est réservé au MO, à la PMO et à la Direction');
     if (req.method === 'GET' && pathname === '/v1/monitoring/projects') {
-      const rows = await db.query(
-        `SELECT p.id,p.project_code AS code,p.name_fr AS name,COALESCE(m.can_submit,false) AS can_submit,COALESCE(m.can_validate,false) AS can_validate FROM project.projects p LEFT JOIN monitoring.project_members m ON m.project_id=p.id AND m.user_id=$3 WHERE p.tenant_id::text=$1 AND p.organization_id::text=$2 AND ($4::boolean OR m.user_id IS NOT NULL) ORDER BY p.project_code`,
-        [tenant, organization, actor.userId, director],
-      );
+      const rows = await listAssignedMonitoringProjects(db, tenant, organization, actor.userId);
       reply(res, 200, {
-        items: rows.rows.map((r: any) => ({
+        items: rows.map((r: any) => ({
           ...r,
           can_submit: !director && mo && r.can_submit,
           can_validate: !director && pmo && r.can_validate,
@@ -107,12 +151,13 @@ export async function monitoringRoute(
     const updateId = match[3];
     if (!uuid.test(projectId) || (updateId && !uuid.test(updateId)))
       throw new HttpError(400, 'Identifiant UUID invalide');
-    const access = (
-      await db.query(
-        `SELECT p.id,COALESCE(m.can_submit,false) AS can_submit,COALESCE(m.can_validate,false) AS can_validate FROM project.projects p LEFT JOIN monitoring.project_members m ON m.project_id=p.id AND m.user_id=$4 WHERE p.id=$1 AND p.tenant_id::text=$2 AND p.organization_id::text=$3 AND ($5::boolean OR m.user_id IS NOT NULL)`,
-        [projectId, tenant, organization, actor.userId, director],
-      )
-    ).rows[0];
+    const access = await getAssignedMonitoringProject(
+      db,
+      projectId,
+      tenant,
+      organization,
+      actor.userId,
+    );
     if (!access) throw new HttpError(404, 'Projet absent ou non affecté');
     if (resource === 'updates' && !updateId && req.method === 'POST') {
       if (director || !mo || !access.can_submit)
@@ -133,6 +178,8 @@ export async function monitoringRoute(
         `INSERT INTO monitoring.project_updates(project_id,submitted_by,reference_date,source_data,comment) VALUES ($1,$2,$3,$4::jsonb,$5) RETURNING id,status,reference_date,created_at`,
         [projectId, actor.userId, referenceDate, JSON.stringify(facts), input.comment.trim()],
       );
+      await db.query('COMMIT');
+      transaction = false;
       reply(res, 201, row.rows[0]);
       return true;
     }
@@ -152,8 +199,6 @@ export async function monitoringRoute(
     if (resource === 'updates' && updateId && req.method === 'POST') {
       if (director || !pmo || !access.can_validate)
         throw new HttpError(403, 'Droit de validation PMO requis sur ce projet');
-      await db.query('BEGIN');
-      transaction = true;
       const update = (
         await db.query(
           `SELECT * FROM monitoring.project_updates WHERE id=$1 AND project_id=$2 FOR UPDATE`,
@@ -161,8 +206,8 @@ export async function monitoringRoute(
         )
       ).rows[0];
       if (!update) throw new HttpError(404, 'Situation introuvable');
-      if (update.submitted_by === actor.userId)
-        throw new HttpError(403, 'Auto-validation interdite');
+      if (!canIndependentlyValidate(roles, access.can_validate, actor.userId, update.submitted_by))
+        throw new HttpError(403, 'Validation indépendante PMO requise');
       if (update.status !== 'submitted') throw new HttpError(409, 'Situation déjà traitée');
       const referenceDate =
         update.reference_date instanceof Date
