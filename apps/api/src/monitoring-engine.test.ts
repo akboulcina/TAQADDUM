@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { expect, test } from 'vitest';
 import { calculate, validateFacts } from './monitoring-engine.js';
+import { canIndependentlyValidate } from './monitoring-routes.js';
 
 test('données absentes ne deviennent pas des valeurs vertes', () => {
   const result = calculate({});
@@ -79,4 +80,12 @@ test('données invalides refusées', () => {
 
 test('réévaluation déterministe', () => {
   expect(calculate({})).toEqual(calculate({}));
+});
+
+test('validation réservée à une PMO affectée et distincte du déclarant', () => {
+  expect(canIndependentlyValidate(['CNED_PMO'], true, 'pmo-user', 'mo-user')).toBe(true);
+  expect(canIndependentlyValidate(['CNED_PMO'], true, 'same-user', 'same-user')).toBe(false);
+  expect(canIndependentlyValidate(['MO'], true, 'pmo-user', 'mo-user')).toBe(false);
+  expect(canIndependentlyValidate(['CNED_DIRECTION'], true, 'director', 'mo-user')).toBe(false);
+  expect(canIndependentlyValidate(['CNED_PMO'], false, 'pmo-user', 'mo-user')).toBe(false);
 });

@@ -6,6 +6,28 @@ workbook at09:59 Africa/Algiers on2026-10-27, not passwords/tokens/credential
 spreadsheets or future confidential data. Original business reference v1 12/10/2026.
 Stale September project attachment must not overwrite this branch state.
 
+## Proposed security remediation lot — 2026-10-28
+
+- This isolated change set is based on `859f173968f6f4f39b286d65547af8900799ccf3`.
+  It adds persistent hashed sessions with expiry/revocation/logout, explicit
+  cross-schema identity links, server-verified organization scope and project
+  permissions, exact RLS context, and explicit monitoring project assignment.
+- The Direction role does not bypass project assignment. Project `001` has no
+  verified organization relationship and is not proposed for assignment.
+- The migration was validated only on a dedicated test database. It has not
+  been applied to the application database; no real user, identity link,
+  membership, role, permission, or project assignment was created.
+- Existing account access remains blocked until a verified person, tenant,
+  organization, role/permissions, and any project scope are approved and
+  provisioned explicitly. No matching by email or UUID is performed.
+- Isolated validation on Node `v22.23.4` / pnpm `9.15.5`: frozen install passed;
+  tests 46/46 including 11 dedicated PostgreSQL/HTTP integrations; explicit
+  typecheck, API/web builds, ESLint, repository Prettier, and `git diff --check`
+  passed. Secret scanner unit tests passed 14/14 and the tracked/untracked scan
+  reported 0 findings and 0 errors. The test URL was the loopback-only dedicated
+  PostgreSQL database; `DATABASE_URL` was unset. The application database was
+  not used. Scanner history/token limitations remain as documented by the tool.
+
 ## Branch, environment and configuration
 
 - Branch feature/import-ready-data, baseline6f7fcb1. R0.5 starts96c0bae
@@ -199,3 +221,22 @@ Stale September project attachment must not overwrite this branch state.
 - Corrected email whitespace validation, terminal newline removal and rejection
   of embedded CR/LF/NUL. Scanner exception remains narrow and unchanged.
 - Behavioral verification pending. Activation tool not executed against a database.
+
+## Project-list assignment review — 2026-10-28
+
+- Review reproduced the visibility gap over HTTP on the dedicated test database:
+  a Direction identity with `projects.read`, assigned only to `ASSIGNED`, received
+  both `ASSIGNED` and `UNASSIGNED` from `GET /v1/projects` before the correction.
+- `listProjects()` now additionally requires an explicit
+  `monitoring.project_members` row for the authenticated public user. A true HTTP
+  regression verifies that only `ASSIGNED` is returned; the user assigned to
+  that project retains access. No organization-wide mandate was introduced.
+- The migration grants the application role only schema usage plus SELECT on
+  `monitoring.project_members` and SELECT/INSERT on `project.projects`, needed by
+  the scoped list/create routes. Test-only manual grants were removed.
+- Validation after this correction: dedicated HTTP/DB test suite 11/11; root
+  tests 47/47; Node `v22.23.4`; typecheck, API build, lint, format, and
+  `git diff --check` passed. No application database was used or migrated.
+- This correction is local and not yet published. It does not create access or
+  grant a real user; the application account-link, membership, and authorization
+  prerequisites recorded above remain in force.

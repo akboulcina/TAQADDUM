@@ -150,7 +150,14 @@ export function Demo() {
       setBusy(false);
     }
   }
-  function signOut() {
+  async function signOut() {
+    if (token) {
+      try {
+        await api('/v1/auth/logout', token, { method: 'POST' });
+      } catch {
+        // Clear local state even if the API is unavailable.
+      }
+    }
     setUser(null);
     setToken('');
     setProjects([]);
