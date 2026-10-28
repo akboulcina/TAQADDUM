@@ -197,7 +197,7 @@ Stale September project attachment must not overwrite this branch state.
   preserves other ZIP payloads and checks removed values are not retained in payloads.
 - Migration and importer no longer use published/shared passwords. New user rows
   get independent random hashes and is_active=false. Existing migration conflicts
-  do nothing; importer conflicts update full_name only, preserving hash/active state.
+  do nothing; importer conflicts update_full_name only, preserving hash/active state.
 - Optional apps/api/scripts/activate-inactive-user.mjs requires explicit email,
   --activate-inactive, DATABASE_URL and password via stdin. Updates only an inactive
   public.users account, never role memberships. Not a production identity solution.
@@ -240,3 +240,27 @@ Stale September project attachment must not overwrite this branch state.
 - This correction is local and not yet published. It does not create access or
   grant a real user; the application account-link, membership, and authorization
   prerequisites recorded above remain in force.
+
+## PMO authentication-context checkpoint — 2026-10-28
+
+- Continuation branch: `feature/pmo-workspace-assistant-2026-10-28`, from
+  `de56c0821ae4071576a0e0edcaa377b20490240a`. Owner's Codespace and excluded
+  local edits are untouched; supplied source export is preserved separately.
+- Added an unused, typed workspace authentication adapter and a separate forward
+  SQL migration. The function checks existing password accounts, explicit identity
+  links, active/unexpired memberships, active organizations/tenants and scoped role
+  permissions, then creates a hashed eight-hour session. No account is provisioned.
+- Canonical and public user IDs remain distinct. Malformed, duplicate or empty
+  scope responses fail closed. Permissions are not merged across organizations.
+- This checkpoint does NOT wire the adapter into login or change the current UI.
+  Existing login/session behavior and prior migration files remain unchanged.
+- Ten unit cases passed after TypeScript 5.8.2 transpilation in the assistant
+  sandbox using Node v20.20.1's built-in test runner in place of Vitest. The source
+  test file targets the existing Vitest framework; Vitest itself was not run here.
+  Syntax parsing passed; project typecheck/build/lint/format remain unverified.
+- The new SQL has not been executed against PostgreSQL. Its trusted SECURITY
+  DEFINER owner and grants require dedicated-database verification before use.
+  This is draft implementation code, not a completed authentication deployment.
+- No SQL applied, existing record modified, real access granted, application
+  restarted, PR merged or deployment performed. Remaining work: dedicated DB
+  tests, login integration, supplied PMO frontend integration and browser checks.
