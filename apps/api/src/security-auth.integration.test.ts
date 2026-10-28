@@ -240,10 +240,6 @@ integration('isolated PostgreSQL security session contract', () => {
     await appConnection.end();
 
     await db.query('BEGIN');
-    await db.query(
-      'GRANT SELECT ON project.projects,monitoring.project_members TO taq_identity_app',
-    );
-    await db.query('GRANT INSERT ON project.projects TO taq_identity_app');
     await db.query('ALTER TABLE project.projects ENABLE ROW LEVEL SECURITY');
     await db.query(`CREATE POLICY test_project_scope ON project.projects
       USING (tenant_id=NULLIF(current_setting('app.tenant_id',true),'')::uuid)
@@ -679,7 +675,6 @@ integration('isolated PostgreSQL security session contract', () => {
     expect(read.status).toBe(200);
     expect((await read.json()).items.map((item: { code: string }) => item.code)).toEqual([
       'ASSIGNED',
-      'UNASSIGNED',
     ]);
 
     const interOrganization = await httpRequest('/v1/projects', {

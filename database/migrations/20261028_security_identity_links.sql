@@ -12,6 +12,9 @@ GRANT SELECT ON org.tenants, org.organizations, org.memberships TO taq_identity_
 GRANT SELECT ON identity.auth_user_links TO taq_identity_ro;
 GRANT SELECT (id,email,full_name,password_hash,is_active) ON public.users TO taq_identity_app;
 GRANT SELECT ON public.user_roles, public.roles TO taq_identity_app;
+GRANT USAGE ON SCHEMA project, monitoring TO taq_identity_app;
+GRANT SELECT, INSERT ON project.projects TO taq_identity_app;
+GRANT SELECT ON monitoring.project_members TO taq_identity_app;
 
 ALTER TABLE identity.auth_user_links ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS identity_users_tenant_context ON identity.users;

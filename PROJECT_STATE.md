@@ -221,3 +221,22 @@ Stale September project attachment must not overwrite this branch state.
 - Corrected email whitespace validation, terminal newline removal and rejection
   of embedded CR/LF/NUL. Scanner exception remains narrow and unchanged.
 - Behavioral verification pending. Activation tool not executed against a database.
+
+## Project-list assignment review — 2026-10-28
+
+- Review reproduced the visibility gap over HTTP on the dedicated test database:
+  a Direction identity with `projects.read`, assigned only to `ASSIGNED`, received
+  both `ASSIGNED` and `UNASSIGNED` from `GET /v1/projects` before the correction.
+- `listProjects()` now additionally requires an explicit
+  `monitoring.project_members` row for the authenticated public user. A true HTTP
+  regression verifies that only `ASSIGNED` is returned; the user assigned to
+  that project retains access. No organization-wide mandate was introduced.
+- The migration grants the application role only schema usage plus SELECT on
+  `monitoring.project_members` and SELECT/INSERT on `project.projects`, needed by
+  the scoped list/create routes. Test-only manual grants were removed.
+- Validation after this correction: dedicated HTTP/DB test suite 11/11; root
+  tests 47/47; Node `v22.23.4`; typecheck, API build, lint, format, and
+  `git diff --check` passed. No application database was used or migrated.
+- This correction is local and not yet published. It does not create access or
+  grant a real user; the application account-link, membership, and authorization
+  prerequisites recorded above remain in force.

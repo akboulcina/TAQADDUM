@@ -288,8 +288,15 @@ async function listProjects(request: IncomingMessage, response: ServerResponse) 
   if (!actor) return sendProblem(response, 401, 'Unauthorized', 'A valid bearer token is required');
   const result = await withOrganizationDatabase(request, actor, 'projects.read', (db, scope) =>
     db.query(
-      'select id,project_code,name_fr,name_ar,name_en,status,organization_id,created_at,updated_at from project.projects where tenant_id=$1 and organization_id=$2 order by created_at desc',
-      [scope.tenantId, scope.organizationId],
+      `select p.id,p.project_code,p.name_fr,p.name_ar,p.name_en,p.status,p.organization_id,p.created_at,p.updated_at
+       from project.projects p
+       where p.tenant_id=$1 and p.organization_id=$2
+         and exists (
+           select 1 from monitoring.project_members m
+           where m.project_id=p.id and m.user_id=$3
+         )
+       order by p.created_at desc`,
+      [scope.tenantId, scope.organizationId, actor.userId],
     ),
   );
   return sendJson(response, 200, {
