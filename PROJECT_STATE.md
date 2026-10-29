@@ -133,7 +133,7 @@ Stale September project attachment must not overwrite this branch state.
   scoped reports. Synthetic datasets labelled.
 - Preserve two delays/uncapped consumption, adjusted/current/delegated AE,
   consolidated works including terminated/parachevement, separate advances; active
-  neither completed nor_received. Authorized administrative count not active count.
+  neither completed nor received. Authorized administrative count not active count.
   CO1/CO6 weights flagged off; wilaya/licence/geo await owner. No eval workbook prose;
   typed missing-aware conditions. H6 brief truncated.
 

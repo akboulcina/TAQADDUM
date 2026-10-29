@@ -89,7 +89,10 @@ describe('PMO workspace authentication contract', () => {
   });
   it('rejects malformed account identities and scope payloads', async () => {
     const row = account();
-    for (const broken of [{ ...row, identity_user_id: '' }, { ...row, contexts: [] }])
+    for (const broken of [
+      { ...row, identity_user_id: '' },
+      { ...row, contexts: [] },
+    ])
       assert.equal(
         await authenticateWorkspace(dbFor([broken]), row.email, randomUUID(), randomUUID()),
         undefined,
