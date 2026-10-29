@@ -1,0 +1,3 @@
+-- Draft checkpoint superseded before deployment; no SQL is executed here.
+-- The unchanged function definition is now in 20261028_workspace_authentication.sql,
+-- after 20261028_security_identity_links.sql, which creates its required table.

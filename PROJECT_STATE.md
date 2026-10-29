@@ -240,3 +240,62 @@ Stale September project attachment must not overwrite this branch state.
 - This correction is local and not yet published. It does not create access or
   grant a real user; the application account-link, membership, and authorization
   prerequisites recorded above remain in force.
+
+## PMO authentication-context checkpoint — 2026-10-28
+
+- Continuation branch: `feature/pmo-workspace-assistant-2026-10-28`, from
+  `de56c0821ae4071576a0e0edcaa377b20490240a`. Owner's Codespace and excluded
+  local edits are untouched; supplied source export is preserved separately.
+- Added an unused, typed workspace authentication adapter and a separate forward
+  SQL migration. The function checks existing password accounts, explicit identity
+  links, active/unexpired memberships, active organizations/tenants and scoped role
+  permissions, then creates a hashed eight-hour session. No account is provisioned.
+- Canonical and public user IDs remain distinct. Malformed, duplicate or empty
+  scope responses fail closed. Permissions are not merged across organizations.
+- This checkpoint does NOT wire the adapter into login or change the current UI.
+  Existing login/session behavior and prior migration files remain unchanged.
+- Ten unit cases passed after TypeScript 5.8.2 transpilation in the assistant
+  sandbox using Node v20.20.1's built-in test runner in place of Vitest. The source
+  test file targets the existing Vitest framework; Vitest itself was not run here.
+  Syntax parsing passed; project typecheck/build/lint/format remain unverified.
+- The new SQL has not been executed against PostgreSQL. Its trusted SECURITY
+  DEFINER owner and grants require dedicated-database verification before use.
+  This is draft implementation code, not a completed authentication deployment.
+- No SQL applied, existing record modified, real access granted, application
+  restarted, PR merged or deployment performed. Remaining work: dedicated DB
+  tests, login integration, supplied PMO frontend integration and browser checks.
+
+## PMO migration ordering correction — 2026-10-28
+
+- The unexecuted draft `20261028_pmo_authentication.sql` sorted before its
+  prerequisite `20261028_security_identity_links.sql`. It is now a comment-only
+  marker; the identical function SQL is in `20261028_workspace_authentication.sql`.
+  Existing security/legacy migrations and the CI workflow are unchanged.
+- Restored the historical phrase `update full_name`; no importer code changed.
+- Static checks verified dependency filename order, exactly one function definition,
+  unchanged SQL payload, comment-only marker and a targeted state-document diff.
+  PostgreSQL bootstrap, Vitest, formatting and full CI remain unverified here.
+- No database migration was executed. Login/UI remain unchanged at this checkpoint.
+
+## PR 12 checkpoint verification — 2026-10-28
+
+- Observed GitHub checks for `4d428b17c419c537353f34d87f4ef4b937588f70`:
+  frozen install, dedicated CI PostgreSQL bootstrap and database audit tests passed.
+  The fresh CI bootstrap therefore exercised the corrected migration order.
+  This does not verify runtime authentication or least-privilege function behavior.
+- Both jobs finished with failure. The general job failed at `pnpm format:check`;
+  subsequent lint, typecheck, Vitest, boundaries, Compose validation and build were
+  skipped. The credential job's scanner tests passed, but its repository scan failed.
+- Reproduced a sensitive-assignment rule hit on the adapter's typed credential
+  parameter. Renamed it to `credentialInput`; the scanner and credential semantics
+  are unchanged. Reformatted the adapter/test candidates and restored the historical
+  phrase `password rotated`. Repository-wide scan and Prettier await rerun in CI.
+- Repeated ten unit cases successfully after TypeScript 5.8.2 transpilation using
+  Node v20.20.1 and the adapted built-in runner, not an actual Vitest execution.
+- Published `main.ts` still uses the prior login/session flow. The new contract is
+  not wired into login or protected routes. No migration or account provisioning
+  occurred on the application database. Live Codespace working-tree inspection is
+  unavailable here; no local files, excluded edits or caches were modified.
+- Continue on PR 12 and its existing branch only. First resolve checkpoint CI,
+  then verify the new SQL with dedicated-database HTTP tests before login/API
+  integration. No additional branch, workflow, deployment or real access is created.
