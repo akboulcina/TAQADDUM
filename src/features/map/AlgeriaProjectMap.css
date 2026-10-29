@@ -1,0 +1,193 @@
+.apm-module {
+  display: grid;
+  gap: 16px;
+  color: #16202c;
+  font-family: "Segoe UI", Inter, system-ui, sans-serif;
+}
+
+.apm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.apm-brand {
+  margin: 0;
+  color: #2f80ed;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.apm-header h2 {
+  margin: 4px 0 5px;
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+}
+
+.apm-subtitle {
+  margin: 0;
+  color: #5b6b7c;
+  font-size: 13px;
+}
+
+.apm-demo-badge {
+  padding: 6px 11px;
+  border: 1px solid #dbe7fb;
+  border-radius: 999px;
+  background: #f4f8fe;
+  color: #1f6fd0;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.apm-toolbar {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px;
+  border: 1px solid #e3e8ee;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 1px 2px rgba(16,24,40,.06);
+}
+
+.apm-toolbar label {
+  display: grid;
+  gap: 5px;
+  color: #5b6b7c;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.apm-toolbar select {
+  min-width: 180px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e3e8ee;
+  border-radius: 7px;
+  background: white;
+  color: #16202c;
+}
+
+.apm-reset {
+  height: 36px;
+  margin-inline-start: auto;
+  padding: 0 13px;
+  border: 1px solid #e3e8ee;
+  border-radius: 7px;
+  background: white;
+  color: #334155;
+  font-weight: 650;
+}
+
+.apm-reset:hover { background: #f8fafc; }
+
+.apm-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 16px;
+  align-items: start;
+}
+
+.apm-map-card,
+.apm-detail-card {
+  border: 1px solid #e3e8ee;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(16,24,40,.07);
+  overflow: hidden;
+}
+
+.apm-map-viewport {
+  height: min(62vh, 590px);
+  overflow: hidden;
+  background: #f8fafc;
+  cursor: grab;
+  touch-action: none;
+}
+
+.apm-map-viewport:active { cursor: grabbing; }
+
+.apm-map-viewport svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.apm-country {
+  fill: #eaf1fd;
+  stroke: #9dc3f7;
+  stroke-width: 2;
+}
+
+.apm-marker { cursor: pointer; }
+.apm-marker text { font-size: 13px; font-weight: 700; fill: #334155; }
+.apm-marker-ring { fill: none; stroke: #2f80ed; stroke-width: 2; opacity: .55; }
+.apm-project-marker { cursor: pointer; }
+.apm-project-marker circle { stroke: white; stroke-width: 2; }
+.apm-project-marker.selected circle { stroke: #16202c; stroke-width: 2.5; }
+
+.apm-map-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-top: 1px solid #e3e8ee;
+  background: white;
+}
+
+.apm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.apm-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.apm-legend i { width: 9px; height: 9px; border-radius: 3px; }
+.apm-map-footer p { margin: 0; color: #7d8b9a; font-size: 11.5px; }
+
+.apm-detail-card { padding: 18px; }
+.apm-detail-card h3 { margin: 0; font-size: 16px; line-height: 1.3; }
+.apm-detail-id { margin: 4px 0 14px; color: #7d8b9a; font-size: 11.5px; }
+.apm-detail-card dl { display: grid; gap: 9px; margin: 0 0 14px; }
+.apm-detail-card dl div { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; }
+.apm-detail-card dt { color: #5b6b7c; }
+.apm-detail-card dd { margin: 0; font-weight: 650; text-align: end; }
+.apm-progress { height: 7px; border-radius: 999px; background: #eef1f4; overflow: hidden; margin-bottom: 16px; }
+.apm-progress span { display: block; height: 100%; background: #2f80ed; }
+.apm-count { margin: 0 0 12px; color: #5b6b7c; font-size: 12.5px; }
+.apm-project-list { display: grid; gap: 8px; margin: 0 0 14px; padding: 0; list-style: none; }
+.apm-project-list button {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e3e8ee;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: inherit;
+  text-align: start;
+}
+.apm-project-list button:hover { background: #f4f8fe; border-color: #b9d2f5; }
+.apm-project-list strong { display: block; font-size: 12.5px; }
+.apm-project-list span { color: #5b6b7c; font-size: 11.5px; }
+.apm-warning { margin: 0 0 14px; padding: 9px 11px; border-radius: 8px; background: #fdf1df; color: #a15c00; font-size: 11.5px; }
+.apm-detail-card > button {
+  width: 100%;
+  height: 36px;
+  border: 1px solid #2f80ed;
+  border-radius: 7px;
+  background: #2f80ed;
+  color: white;
+  font-weight: 650;
+}
+
+@media (max-width: 1100px) {
+  .apm-layout { grid-template-columns: minmax(0, 1fr); }
+  .apm-map-viewport { height: 52vh; }
+}
